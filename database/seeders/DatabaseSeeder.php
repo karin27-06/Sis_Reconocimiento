@@ -15,18 +15,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
-            AlmacenSeeder::class,
-            ClientTypeSeeder::class,
             EmployeeTypeSeeder::class,
-            CategorySeeder::class,
-            FloorSeeder::class,
-            AreasSeeder::class,
-            TableSeeder::class,
-            SupplierSeeder::class,
-            CustomerSeeder::class,
             //development
             PresentationSeeder::class,
-            InputSeeder::class,
             //development
         ]);
     }
