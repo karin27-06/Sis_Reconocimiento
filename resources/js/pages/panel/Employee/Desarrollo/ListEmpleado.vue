@@ -17,7 +17,7 @@
                     </IconField>
                     <Select v-model="selectedEstadoEmpleado" :options="estadoEmpleadoOptions" optionLabel="name"
                         placeholder="Estado" class="w-full md:w-auto" />
-                    <Button icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEmpleado" />
+                    <Button title="Refrescar" icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEmpleado" />
                 </div>
             </div>
         </template>
@@ -37,13 +37,20 @@
         </Column>
         <Column field="foto" header="Foto" style="min-width: 8rem">
             <template #body="{ data }">
-                <img v-if="data.foto" :src="`/storage/${data.foto}`" alt="Foto" class="w-12 h-12 rounded-full object-cover" />
+                <img
+                    v-if="data.foto"
+                    :src="`/storage/${data.foto}`"
+                    alt="Foto"
+                    title="Ver foto"
+                    class="w-12 h-12 rounded-full object-cover cursor-pointer"
+                    @click="verFoto(data.foto)"
+                />
             </template>
         </Column>
         <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
-                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editEmpleado(slotProps.data)" />
-                <Button icon="pi pi-trash" outlined rounded severity="danger"
+                <Button title="Editar empleado" icon="pi pi-pencil" outlined rounded class="mr-2" @click="editEmpleado(slotProps.data)" />
+                <Button title="Eliminar empleado" icon="pi pi-trash" outlined rounded severity="danger"
                     @click="confirmDeleteEmpleado(slotProps.data)" />
             </template>
         </Column>
@@ -52,6 +59,9 @@
     <DeleteEmpleado v-model:visible="deleteEmpleadoDialog" :empleado="empleado" @deleted="handleEmpleadoDeleted" />
     <UpdateEmpleado v-model:visible="updateEmpleadoDialog" :empleadoId="selectedEmpleadoId"
         @updated="handleEmpleadoUpdated" />
+    <Dialog v-model:visible="fotoDialog" modal :closable="true" :style="{ width: '50vw' }">
+        <img v-if="fotoPreview" :src="fotoPreview" alt="Foto Empleado" class="w-full h-auto object-contain" />
+    </Dialog>
 </template>
 
 <script setup>
@@ -69,7 +79,10 @@ import { debounce } from 'lodash';
 import DeleteEmpleado from './DeleteEmpleado.vue';
 import UpdateEmpleado from './UpdateEmpleado.vue';
 import { useToast } from 'primevue/usetoast';
+import Dialog from 'primevue/dialog';
 
+const fotoDialog = ref(false); // controla si el modal está abierto
+const fotoPreview = ref('');   // guarda la ruta de la foto a mostrar
 const toast = useToast();
 const dt = ref();
 const empleados = ref([]);
@@ -81,6 +94,12 @@ const empleado = ref({});
 const selectedEmpleadoId = ref(null);
 const selectedEstadoEmpleado = ref(null);
 const updateEmpleadoDialog = ref(false);
+
+function verFoto(foto) {
+    if (!foto) return;
+    fotoPreview.value = `/storage/${foto}`; // ruta correcta
+    fotoDialog.value = true;               // abrir modal
+}
 
 const props = defineProps({
     refresh: {

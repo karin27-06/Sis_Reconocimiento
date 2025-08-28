@@ -143,7 +143,7 @@ onMounted(() => {
                     </IconField>
                     <Select v-model="selectedEstadoEspacio" :options="estadoEspacioOptions" optionLabel="name"
                         placeholder="Estado" class="w-full md:w-auto" />
-                    <Button icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEspacio" />
+                    <Button title="Refrescar" icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEspacio" />
                 </div>
             </div>
         </template>
@@ -160,8 +160,8 @@ onMounted(() => {
         </Column>
         <Column field="actions" header="Acciones" :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
-                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editEspacio(slotProps.data)" />
-                <Button icon="pi pi-trash" outlined rounded severity="danger"
+                <Button title="Editar espacio" icon="pi pi-pencil" outlined rounded class="mr-2" @click="editEspacio(slotProps.data)" />
+                <Button title="Eliminar espacio" icon="pi pi-trash" outlined rounded severity="danger"
                     @click="confirmDeleteEspacio(slotProps.data)" />
             </template>
         </Column>
