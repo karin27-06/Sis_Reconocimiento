@@ -11,7 +11,7 @@ import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
     visible: Boolean,
-    presentacionId: Number
+    espacioId: Number
 });
 const emit = defineEmits(['update:visible', 'updated']);
 
@@ -21,7 +21,7 @@ const loading = ref(false);
 const submitted = ref(false);
 const serverErrors = ref({});
 
-const presentacion = ref({
+const espacio = ref({
     name: '',
     description: '',
     state: false,
@@ -29,47 +29,47 @@ const presentacion = ref({
 
 watch(() => props.visible, (val) => {
     dialogVisible.value = val;
-    if (val && props.presentacionId) {
-        fetchPresentacion();
+    if (val && props.espacioId) {
+        fetchEspacio();
     }
 });
 watch(dialogVisible, (val) => emit('update:visible', val));
 
-const fetchPresentacion = async () => {
+const fetchEspacio = async () => {
     try {
         loading.value = true;
-        const res = await axios.get(`/presentacion/${props.presentacionId}`);
-        const data = res.data.presentation;
-        presentacion.value = {
+        const res = await axios.get(`/espacio/${props.espacioId}`);
+        const data = res.data.space;
+        espacio.value = {
             name: data.name,
             description: data.description || '',
             state: data.state
         };
     } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la presentación', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar el espacio', life: 3000 });
         console.error(error);
     } finally {
         loading.value = false;
     }
 };
 
-const updatePresentacion = async () => {
+const updateEspacio = async () => {
     submitted.value = true;
     serverErrors.value = {};
 
     try {
-        const presentacionData = {
-            name: presentacion.value.name,
-            description: presentacion.value.description,
-            state: presentacion.value.state
+        const espacioData = {
+            name: espacio.value.name,
+            description: espacio.value.description,
+            state: espacio.value.state
         };
 
-        await axios.put(`/presentacion/${props.presentacionId}`, presentacionData);
+        await axios.put(`/espacio/${props.espacioId}`, espacioData);
 
         toast.add({
             severity: 'success',
             summary: 'Actualizado',
-            detail: 'Presentación actualizada correctamente',
+            detail: 'Espacio actualizado correctamente',
             life: 3000
         });
 
@@ -88,7 +88,7 @@ const updatePresentacion = async () => {
             toast.add({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'No se pudo actualizar la presentación',
+                detail: 'No se pudo actualizar el espacio',
                 life: 3000
             });
         }
@@ -98,13 +98,13 @@ const updatePresentacion = async () => {
 </script>
 
 <template>
-    <Dialog v-model:visible="dialogVisible" header="Editar Presentación" modal :closable="true" :style="{ width: '600px' }">
+    <Dialog v-model:visible="dialogVisible" header="Editar espacio de trabajo" modal :closable="true" :style="{ width: '600px' }">
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-10">
                     <label class="block font-bold mb-2">Nombre <span class="text-red-500">*</span></label>
                     <InputText
-                        v-model="presentacion.name"
+                        v-model="espacio.name"
                         required
                         maxlength="150"
                         fluid
@@ -115,14 +115,14 @@ const updatePresentacion = async () => {
                  <div class="col-span-2">
                     <label class="block font-bold mb-2">Estado <span class="text-red-500">*</span></label>
                     <div class="flex items-center gap-3">
-                        <Checkbox v-model="presentacion.state" :binary="true" />
-                        <Tag :value="presentacion.state ? 'Activo' : 'Inactivo'" :severity="presentacion.state ? 'success' : 'danger'" />
+                        <Checkbox v-model="espacio.state" :binary="true" />
+                        <Tag :value="espacio.state ? 'Activo' : 'Inactivo'" :severity="espacio.state ? 'success' : 'danger'" />
                     </div>
                 </div>
                 <div class="col-span-12">
                     <label class="block font-bold mb-3">Descripción</label>
                     <Textarea
-                        v-model="presentacion.description"
+                        v-model="espacio.description"
                         maxlength="255"
                         rows="4" autoResize fluid
                         :class="{ 'p-invalid': serverErrors.description }" 
@@ -133,7 +133,7 @@ const updatePresentacion = async () => {
         </div>
         <template #footer>
             <Button label="Cancelar" icon="pi pi-times" text @click="dialogVisible = false" />
-            <Button label="Guardar" icon="pi pi-check" @click="updatePresentacion" :loading="loading" />
+            <Button label="Guardar" icon="pi pi-check" @click="updateEspacio" :loading="loading" />
         </template>
     </Dialog>
 </template>

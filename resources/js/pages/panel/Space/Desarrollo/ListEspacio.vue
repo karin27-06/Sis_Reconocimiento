@@ -9,20 +9,20 @@ import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import axios from 'axios';
 import { debounce } from 'lodash';
-import DeletePresentacion from './DeletePresentacion.vue';
-import UpdatePresentacion from './UpdatePresentacion.vue';
+import DeleteEspacio from './DeleteEspacio.vue';
+import UpdateEspacio from './UpdateEspacio.vue';
 import Select from 'primevue/select';
 
 const dt = ref();
-const presentaciones = ref([]);
-const selectedPresentaciones = ref();
+const espacios = ref([]);
+const selectedEspacios = ref();
 const loading = ref(false);
 const globalFilterValue = ref('');
-const deletePresentacionDialog = ref(false);
-const presentacion = ref({});
-const selectedPresentacionId = ref(null);
-const selectedEstadoPresentacion = ref(null);
-const updatePresentacionDialog = ref(false);
+const deleteEspacioDialog = ref(false);
+const espacio = ref({});
+const selectedEspacioId = ref(null);
+const selectedEstadoEspacio = ref(null);
+const updateEspacioDialog = ref(false);
 const currentPage = ref(1);
 
 const props = defineProps({
@@ -33,32 +33,32 @@ const props = defineProps({
 });
 
 watch(() => props.refresh, () => {
-    loadPresentacion();
+    loadEspacio();
 });
 
-watch(() => selectedEstadoPresentacion.value, () => {
+watch(() => selectedEstadoEspacio.value, () => {
     currentPage.value = 1;
-    loadPresentacion();
+    loadEspacio();
 });
 
-function editPresentacion(p) {
-    selectedPresentacionId.value = p.id;
-    updatePresentacionDialog.value = true;
+function editEspacio(e) {
+    selectedEspacioId.value = e.id;
+    updateEspacioDialog.value = true;
 }
 
-const estadoPresentacionOptions = ref([
+const estadoEspacioOptions = ref([
     { name: 'TODOS', value: '' },
     { name: 'ACTIVOS', value: 1 },
     { name: 'INACTIVOS', value: 0 },
 ]);
 
-function handlePresentacionUpdated() {
-    loadPresentacion();
+function handleEspacioUpdated() {
+    loadEspacio();
 }
 
-function confirmDeletePresentacion(selected) {
-    presentacion.value = selected;
-    deletePresentacionDialog.value = true;
+function confirmDeleteEspacio(selected) {
+    espacio.value = selected;
+    deleteEspacioDialog.value = true;
 }
 
 const pagination = ref({
@@ -72,11 +72,11 @@ const filters = ref({
     online: null
 });
 
-function handlePresentacionDeleted() {
-    loadPresentacion();
+function handleEspacioDeleted() {
+    loadEspacio();
 }
 
-const loadPresentacion = async () => {
+const loadEspacio = async () => {
     loading.value = true;
     try {
         const params = {
@@ -85,18 +85,18 @@ const loadPresentacion = async () => {
             search: globalFilterValue.value,
             state: filters.value.state,
         };
-        if (selectedEstadoPresentacion.value !== null && selectedEstadoPresentacion.value.value !== '') {
-            params.state = selectedEstadoPresentacion.value.value;
+        if (selectedEstadoEspacio.value !== null && selectedEstadoEspacio.value.value !== '') {
+            params.state = selectedEstadoEspacio.value.value;
         }
 
-        const response = await axios.get('/presentacion', { params });
+        const response = await axios.get('/espacio', { params });
 
-        presentaciones.value = response.data.data;
+        espacios.value = response.data.data;
         pagination.value.currentPage = response.data.meta.current_page;
         pagination.value.total = response.data.meta.total;
     } catch (error) {
-        console.error('Error al cargar presentaciones:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar las presentaciones', life: 3000 });
+        console.error('Error al cargar los espacios:', error);
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los espacios', life: 3000 });
     } finally {
         loading.value = false;
     }
@@ -105,7 +105,7 @@ const loadPresentacion = async () => {
 const onPage = (event) => {
     pagination.value.currentPage = event.page + 1;
     pagination.value.perPage = event.rows;
-    loadPresentacion();
+    loadEspacio();
 };
 
 const getSeverity = (value) => {
@@ -116,34 +116,34 @@ const getSeverity = (value) => {
 
 const onGlobalSearch = debounce(() => {
     pagination.value.currentPage = 1;
-    loadPresentacion();
+    loadEspacio();
 }, 500);
 
 onMounted(() => {
-    loadPresentacion();
+    loadEspacio();
 });
 </script>
 
 <template>
-    <DataTable ref="dt" v-model:selection="selectedPresentaciones" :value="presentaciones" dataKey="id" :paginator="true"
+    <DataTable ref="dt" v-model:selection="selectedEspacios" :value="espacios" dataKey="id" :paginator="true"
         :rows="pagination.perPage" :totalRecords="pagination.total" :loading="loading" :lazy="true" @page="onPage"
         :rowsPerPageOptions="[15, 20, 25]" scrollable scrollHeight="574px"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} presentaciones">
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} espacios">
 
         <template #header>
             <div class="flex flex-wrap gap-2 items-center justify-between">
-                <h4 class="m-0">PRESENTACIONES</h4>
+                <h4 class="m-0">ESPACIOS DE TRABAJO</h4>
                 <div class="flex flex-wrap gap-2">
                     <IconField>
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar..." />
+                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar espacio..." />
                     </IconField>
-                    <Select v-model="selectedEstadoPresentacion" :options="estadoPresentacionOptions" optionLabel="name"
+                    <Select v-model="selectedEstadoEspacio" :options="estadoEspacioOptions" optionLabel="name"
                         placeholder="Estado" class="w-full md:w-auto" />
-                    <Button icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadPresentacion" />
+                    <Button icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEspacio" />
                 </div>
             </div>
         </template>
@@ -160,14 +160,14 @@ onMounted(() => {
         </Column>
         <Column field="actions" header="Acciones" :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
-                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editPresentacion(slotProps.data)" />
+                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editEspacio(slotProps.data)" />
                 <Button icon="pi pi-trash" outlined rounded severity="danger"
-                    @click="confirmDeletePresentacion(slotProps.data)" />
+                    @click="confirmDeleteEspacio(slotProps.data)" />
             </template>
         </Column>
     </DataTable>
 
-    <DeletePresentacion v-model:visible="deletePresentacionDialog" :presentacion="presentacion" @deleted="handlePresentacionDeleted" />
-    <UpdatePresentacion v-model:visible="updatePresentacionDialog" :presentacionId="selectedPresentacionId"
-        @updated="handlePresentacionUpdated" />
+    <DeleteEspacio v-model:visible="deleteEspacioDialog" :espacio="espacio" @deleted="handleEspacioDeleted" />
+    <UpdateEspacio v-model:visible="updateEspacioDialog" :espacioId="selectedEspacioId"
+        @updated="handleEspacioUpdated" />
 </template>

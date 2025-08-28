@@ -27,7 +27,7 @@ const model = computed(() => [
         hasPermission('ver tipos_empleados') && { label: 'Tipo de empleados', icon: 'pi pi-fw pi-sitemap', to: '/tipo_empleados' },
       ].filter(Boolean),
     },
-    hasPermission('ver presentaciones') && { label: 'Presentaciones', icon: 'pi pi-fw pi-check-square', to: '/presentaciones' },
+    hasPermission('ver espacios') && { label: 'Espacios', icon: 'pi pi-fw pi-briefcase', to: '/espacios' },
   ].filter(Boolean),
 },
 ].filter(section => section.items.length > 0));

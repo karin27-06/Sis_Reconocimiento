@@ -2,26 +2,26 @@
 
 namespace App\Policies;
 
-use App\Models\Presentation;
+use App\Models\Space;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class PresentationPolicy
+class SpacePolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('ver presentaciones');     
+        return $user->can('ver espacios');     
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Presentation $presentation): bool
+    public function view(User $user, Space $space): bool
     {
-        return $user->can('ver presentaciones');
+        return $user->can('ver espacios');
     }
 
     /**
@@ -29,29 +29,29 @@ class PresentationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('crear presentaciones');
+        return $user->can('crear espacios');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Presentation $presentation): bool
+    public function update(User $user, Space $space): bool
     {
-        return $user->can('editar presentaciones');
+        return $user->can('editar espacios');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Presentation $presentation): bool
+    public function delete(User $user, Space $space): bool
     {
-        return $user->can('eliminar presentaciones');
+        return $user->can('eliminar espacios');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Presentation $presentation): bool
+    public function restore(User $user, Space $space): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class PresentationPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Presentation $presentation): bool
+    public function forceDelete(User $user, Space $space): bool
     {
         return false;
     }
