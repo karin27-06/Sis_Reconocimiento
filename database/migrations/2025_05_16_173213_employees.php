@@ -14,11 +14,17 @@ return new class extends Migration
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('codigo',8)->unique();
+            $table->string('apellido');
+            $table->string('codigo', 8)->unique(); // <--- CAMBIO: string(8) en lugar de integer
             $table->foreignId('employee_type_id')->constrained('employee_types','id');
-            $table->boolean('state')->default(true);
+            $table->integer('idHuella')->unique(); // entero, no FK
+            $table->string('foto');      // ruta de foto en storage
+            $table->boolean('state')->default(true)->comment('true: activo, false: inactivo');
             $table->timestamps();
         });
     }
-    public function down(): void { Schema::dropIfExists('employees'); }
+    public function down(): void
+    {
+        Schema::dropIfExists('employees');
+    }
 };

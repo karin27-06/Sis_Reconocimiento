@@ -8,19 +8,23 @@ use Illuminate\Database\Seeder;
 class EmployeeTypeSeeder extends Seeder{
     public function run(): void{
         EmployeeType::create([
-            'name' => 'Jefe de Cocina',
+            'name' => 'Administrador',
             'state' => true,
         ]);
         EmployeeType::create([
-            'name' => 'Cocinero',
+            'name' => 'Docente',
             'state' => true,
         ]);
         EmployeeType::create([
-            'name' => 'Ayudante de Cocina',
+            'name' => 'Limpieza',
             'state' => true,
         ]);
         EmployeeType::create([
-            'name' => 'Repartidor delivery',
+            'name' => 'Asistente',
+            'state' => true,
+        ]);
+        EmployeeType::create([
+            'name' => 'Supervisor',
             'state' => true,
         ]);
         //EmployeeType::factory(600)->create();

@@ -13,8 +13,11 @@ class Employee extends Model
 
     protected $fillable = [
         'name',
+        'apellido',
         'codigo',
         'employee_type_id',
+        'idHuella',
+        'foto',
         'state',
     ];
 
