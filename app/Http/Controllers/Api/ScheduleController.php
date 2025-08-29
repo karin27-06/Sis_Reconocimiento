@@ -11,6 +11,7 @@ use App\Http\Resources\ScheduleResource;
 use App\Models\Schedule;
 use Illuminate\Pipeline\Pipeline;
 use App\Pipelines\FilterById;
+use App\Pipelines\FilterBySearch;
 use App\Pipelines\FilterByState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -24,12 +25,12 @@ class ScheduleController extends Controller
         $search = $request->input('search');
 
         $query = app(Pipeline::class)
-                ->send(Schedule::query())
-                ->through([
-                    new FilterById($search),
-                    new FilterByState($request->input('state')),
-                ])
-                ->thenReturn();
+            ->send(Schedule::query())
+            ->through([
+                new FilterBySearch($search),
+                new FilterByState($request->input('state')),
+            ])
+            ->thenReturn();
 
         return ScheduleResource::collection($query->paginate($perPage));
     }
