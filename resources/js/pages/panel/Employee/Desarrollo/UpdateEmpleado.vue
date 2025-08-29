@@ -174,7 +174,7 @@ const fetchEmpleado = async () => {
             foto: null,
             state: data.state
         };
-        fotoOriginal = data.foto ? `/storage/${data.foto}` : null;
+        fotoOriginal = data.foto ? `/${data.foto}` : null;
         fotoPreview.value = fotoOriginal;
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar el empleado', life: 3000 });
