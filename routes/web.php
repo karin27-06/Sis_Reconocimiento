@@ -9,10 +9,12 @@ use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\UsuariosController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Web\EmployeeTypeWebController;
 use App\Http\Controllers\Web\EmployeeWebController;
+use App\Http\Controllers\Web\ScheduleWebController;
 use App\Http\Controllers\Web\SpaceWebController;
 use App\Http\Controllers\Web\UsuarioWebController;
 
@@ -33,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     #VISTAS DEL FRONTEND
+    Route::get('/horarios', [ScheduleWebController::class, 'index'])->name('index.view');
     Route::get('/espacios', [SpaceWebController::class, 'index'])->name('index.view');
     Route::get('/empleados', [EmployeeWebController::class, 'index'])->name('index.view');
     Route::get('/tipo_empleados', [EmployeeTypeWebController::class, 'index'])->name('index.view');
@@ -51,6 +54,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{space}', [SpaceController::class, 'show'])->name('espacios.show');
         Route::put('/{space}', [SpaceController::class, 'update'])->name('espacios.update');
         Route::delete('/{space}', [SpaceController::class, 'destroy'])->name('espacios.destroy');
+    });
+
+    #HORARIO => BACKEND
+    Route::prefix('horario')->group(function () {
+        Route::get('/', [ScheduleController::class, 'index'])->name('horario.index');
+        Route::post('/', [ScheduleController::class, 'store'])->name('horarios.store');
+        Route::get('{schedule}', [ScheduleController::class, 'show'])->name('horarios.show');
+        Route::put('{schedule}', [ScheduleController::class, 'update'])->name('horarios.update');
+        Route::delete('{schedule}', [ScheduleController::class, 'destroy'])->name('horarios.destroy');
     });
 
     #EMPLEADO => BACKEND
