@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             EmployeeTypeSeeder::class,
             //development
-            PresentationSeeder::class,
+            SpaceSeeder::class,
             //development
         ]);
     }

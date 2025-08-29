@@ -7,7 +7,7 @@ import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
     visible: Boolean,
-    presentacion: Object,
+    espacio: Object,
 });
 const emit = defineEmits(['update:visible', 'deleted']);
 
@@ -22,20 +22,20 @@ function closeDialog() {
     emit('update:visible', false);
 }
 
-async function deletePresentacion() {
+async function deleteEspacio() {
     try {
-        await axios.delete(`/presentacion/${props.presentacion.id}`);
+        await axios.delete(`/espacio/${props.espacio.id}`);
         emit('deleted');
         closeDialog();
         toast.add({
             severity: 'success',
             summary: 'Éxito',
-            detail: 'Presentación eliminada correctamente',
+            detail: 'Espacio eliminado correctamente',
             life: 3000
         });
     } catch (error) {
         console.error(error);
-        let errorMessage = 'Error eliminando la presentación';
+        let errorMessage = 'Error eliminando el espacio';
         if (error.response) {
             errorMessage = error.response.data.message || errorMessage;
         }
@@ -49,11 +49,11 @@ async function deletePresentacion() {
         @update:visible="closeDialog">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="presentacion">¿Estás seguro de eliminar la presentación llamada: <b>{{ presentacion.name }}</b>?</span>
+            <span v-if="espacio">¿Estás seguro de eliminar el espacio de trabajo llamado: <b>{{ espacio.name }}</b>?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="closeDialog" />
-            <Button label="Sí" icon="pi pi-check" @click="deletePresentacion" />
+            <Button label="Sí" icon="pi pi-check" @click="deleteEspacio" />
         </template>
     </Dialog>
 </template>

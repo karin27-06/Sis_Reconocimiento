@@ -26,11 +26,11 @@ class PermissionSeeder extends Seeder{
         Permission::create(['name' =>'editar permisos']);
         Permission::create(['name' =>'eliminar permisos']);
         Permission::create(['name' =>'ver permisos']);
-        #Presentaciones
-        Permission::create(['name' => 'crear presentaciones']);
-        Permission::create(['name' => 'editar presentaciones']);
-        Permission::create(['name' => 'eliminar presentaciones']);
-        Permission::create(['name' => 'ver presentaciones']);
+        # Espacios
+        Permission::create(['name' => 'crear espacios']);
+        Permission::create(['name' => 'editar espacios']);
+        Permission::create(['name' => 'eliminar espacios']);
+        Permission::create(['name' => 'ver espacios']);
         #empleado
         Permission::create(['name' => 'crear empleados']);
         Permission::create(['name' => 'editar empleados']);
@@ -41,5 +41,10 @@ class PermissionSeeder extends Seeder{
         Permission::create(['name' => 'editar tipos_empleados']);
         Permission::create(['name' => 'eliminar tipos_empleados']);
         Permission::create(['name' => 'ver tipos_empleados']);
+        #Horarios
+        Permission::create(['name' => 'crear horarios']);
+        Permission::create(['name' => 'editar horarios']);
+        Permission::create(['name' => 'eliminar horarios']);
+        Permission::create(['name' => 'ver horarios']);
     }
 }

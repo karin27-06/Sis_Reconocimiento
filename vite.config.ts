@@ -34,9 +34,10 @@ export default defineConfig({
         },
     },
     server: {
-        host: '0.0.0.0',
+        host: '0.0.0.0', // permite conexiones desde otros dispositivos en la red
+        port: 5173,      // puedes cambiarlo si quieres
         hmr: {
-            host: 'localhost',
+            host: '192.168.1.89', // reemplaza con la IP de tu PC en la red local
         },
         cors: true,
     },

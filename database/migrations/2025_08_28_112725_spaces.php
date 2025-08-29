@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('presentations', function (Blueprint $table) {
+        Schema::create('spaces', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('description')->nullable();
+            $table->text('description')->nullable(); // Texto largo
             $table->boolean('state')->default(true)->comment('0: Inactivo, 1: Activo');
-            $table->timestamps();
+            $table->timestamps(); // created_at = fecha de registro, updated_at = última actualización
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('presentations');
+        Schema::dropIfExists('spaces');
     }
 };

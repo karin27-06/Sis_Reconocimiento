@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-wrap items-center gap-3 p-2">
         <!-- Exportar Excel -->
-        <a href="/panel/reports/export-excel-presentations" download>
+        <a href="/panel/reports/export-excel-spaces" download>
             <Button variant="outlined" size="small" class="bg-green-600 hover:bg-green-700 text-white" icon="pi pi-file-excel" label="Exportar a Excel" title="Exportar a Excel">
             </Button>
         </a>
@@ -14,7 +14,7 @@
         </div> -->
 
         <!-- Exportar PDF -->
-        <a href="/panel/reports/export-pdf-presentations" download>
+        <a href="/panel/reports/export-pdf-spaces" download>
             <Button variant="outlined" size="small" class="bg-red-600 hover:bg-red-700 text-white" icon="pi pi-file-pdf" label="Exportar a PDF" title="Exportar PDF">
             </Button>
         </a>
@@ -48,11 +48,11 @@ const handleFileChange = async (event: Event) => {
 
     try {
         //REVISAR AQUI LA RUTA POST
-        await axios.post('/api/presentaciones/import-excel', formData, {
+        await axios.post('/api/espacios/import-excel', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
 
-        toast.add({ severity: 'success', summary: 'Importación exitosa', detail: 'Presentaciones importadas correctamente.'})
+        toast.add({ severity: 'success', summary: 'Importación exitosa', detail: 'Espacios importados correctamente.'})
         emit('import-success')
         target.value = ''
     } catch (error) {

@@ -1,19 +1,21 @@
 <?php
 
 use App\Http\Controllers\Reportes\EmployeeTypePDFController;
-use App\Http\Controllers\Reportes\PresentationPDFController;
 use App\Http\Controllers\Reportes\EmployeePDFController;
 use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\PresentationController;
 use App\Http\Controllers\Api\ConsultasDni;
 use App\Http\Controllers\Api\ConsultasId;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\UsuariosController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Web\PresentationWebController;
+use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\SpaceController;
+use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Web\EmployeeTypeWebController;
 use App\Http\Controllers\Web\EmployeeWebController;
+use App\Http\Controllers\Web\ScheduleWebController;
+use App\Http\Controllers\Web\SpaceWebController;
 use App\Http\Controllers\Web\UsuarioWebController;
 
 use Illuminate\Support\Facades\Route;
@@ -33,7 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     #VISTAS DEL FRONTEND
-    Route::get('/presentaciones', [PresentationWebController::class, 'index'])->name('index.view');
+    Route::get('/horarios', [ScheduleWebController::class, 'index'])->name('index.view');
+    Route::get('/espacios', [SpaceWebController::class, 'index'])->name('index.view');
     Route::get('/empleados', [EmployeeWebController::class, 'index'])->name('index.view');
     Route::get('/tipo_empleados', [EmployeeTypeWebController::class, 'index'])->name('index.view');
     Route::get('/usuario', [UsuarioWebController::class, 'index'])->name('index.view');
@@ -44,13 +47,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/consulta/{dni}', [ConsultasDni::class, 'consultar'])->name('consultar.dni');
     Route::get('/user-id', [ConsultasId::class, 'getUserId'])->middleware('auth:api');
 
-    // PRESENTACION -> BACKEND
-    Route::prefix('presentacion')->group(function () {
-        Route::get('/', [PresentationController::class, 'index'])->name('presentacion.index');
-        Route::post('/', [PresentationController::class, 'store'])->name('presentaciones.store');
-        Route::get('/{presentation}', [PresentationController::class, 'show'])->name('presentaciones.show');
-        Route::put('/{presentation}', [PresentationController::class, 'update'])->name('presentaciones.update');
-        Route::delete('/{presentation}', [PresentationController::class, 'destroy'])->name('presentaciones.destroy');
+    // ESPACIO -> BACKEND
+    Route::prefix('espacio')->group(function () {
+        Route::get('/', [SpaceController::class, 'index'])->name('espacio.index');
+        Route::post('/', [SpaceController::class, 'store'])->name('espacios.store');
+        Route::get('/{space}', [SpaceController::class, 'show'])->name('espacios.show');
+        Route::put('/{space}', [SpaceController::class, 'update'])->name('espacios.update');
+        Route::delete('/{space}', [SpaceController::class, 'destroy'])->name('espacios.destroy');
+    });
+
+    #HORARIO => BACKEND
+    Route::prefix('horario')->group(function () {
+        Route::get('/', [ScheduleController::class, 'index'])->name('horario.index');
+        Route::post('/', [ScheduleController::class, 'store'])->name('horarios.store');
+        Route::get('{schedule}', [ScheduleController::class, 'show'])->name('horarios.show');
+        Route::put('{schedule}', [ScheduleController::class, 'update'])->name('horarios.update');
+        Route::delete('{schedule}', [ScheduleController::class, 'destroy'])->name('horarios.destroy');
     });
 
     #EMPLEADO => BACKEND
@@ -91,11 +103,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::prefix('panel/reports')->group(function () {
 
-        #EXPORTACION Y IMPORTACION PRESENTACIONES
-        Route::get('/export-excel-presentations', [PresentationController::class, 'exportExcel'])->name('export-excel-presentations');
-        Route::get('/export-pdf-presentations', [PresentationPDFController::class, 'exportPDF'])->name('export-pdf-presentations');
+        #EXPORTACION Y IMPORTACION ESPACIOS
+        Route::get('/export-excel-spaces', [SpaceController::class, 'exportExcel'])->name('export-excel-spaces');
+        Route::get('/export-pdf-spaces', [SpacePDFController::class, 'exportPDF'])->name('export-pdf-spaces');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-presentations', [PresentationController::class, 'importExcel'])->name('import-excel-presentations');
+        Route::post('/import-excel-spaces', [SpaceController::class, 'importExcel'])->name('import-excel-spaces');
 
         #EXPORTACION Y IMPORTACION TIPOS DE EMPLEADOS
         Route::get('/export-excel-employeeTypes', [EmployeeTypeController::class, 'exportExcel'])->name('export-excel-employeeTypes');
