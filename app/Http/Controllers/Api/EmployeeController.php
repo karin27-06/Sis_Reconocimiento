@@ -15,7 +15,9 @@ use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Gate;
 
-class EmployeeController extends Controller{
+class EmployeeController extends Controller
+{
+    private $uploadPath = 'uploads/fotos/empleados';
     public function index(Request $request){
         Gate::authorize('viewAny', Employee::class);
         $perPage = $request->input('per_page', 15);
@@ -30,11 +32,26 @@ class EmployeeController extends Controller{
 
         return EmployeeResource::collection($query->paginate($perPage));
     }
+
     public function store(StoreEmployeeRequest $request){
         Gate::authorize('create', Employee::class);
         $validated = $request->validated();
         if ($request->hasFile('foto')) {
-            $validated['foto'] = $request->file('foto')->store('empleados', 'public');
+            $folder = public_path($this->uploadPath);
+
+            // Crear carpeta si no existe
+            if (!file_exists($folder)) {
+                mkdir($folder, 0777, true);
+            }
+
+            // Generar nombre único
+            $fileName = uniqid().'_'.$request->file('foto')->getClientOriginalName();
+
+            // Mover archivo
+            $request->file('foto')->move($folder, $fileName);
+
+            // Guardar ruta relativa (para acceder desde frontend)
+            $validated['foto'] = $this->uploadPath . '/' . $fileName;
         }
         $employee = Employee::create($validated);
         return response()->json([
@@ -55,11 +72,25 @@ class EmployeeController extends Controller{
         Gate::authorize('update', $employee);
         $validated = $request->validated();
         if ($request->hasFile('foto')) {
-            // eliminar la foto anterior si existe
-            if ($employee->foto && \Storage::disk('public')->exists($employee->foto)) {
-                \Storage::disk('public')->delete($employee->foto);
+            $folder = public_path($this->uploadPath);
+            // Crear carpeta si no existe
+            if (!file_exists($folder)) {
+                mkdir($folder, 0777, true);
             }
-            $validated['foto'] = $request->file('foto')->store('empleados', 'public');
+
+            // Eliminar foto anterior si existe
+            if ($employee->foto && file_exists(public_path($employee->foto))) {
+                unlink(public_path($employee->foto));
+            }
+
+            // Generar nombre único
+            $fileName = uniqid().'_'.$request->file('foto')->getClientOriginalName();
+
+            // Mover archivo
+            $request->file('foto')->move($folder, $fileName);
+
+            // Guardar ruta relativa
+            $validated['foto'] = $this->uploadPath . '/' . $fileName;
         }
         $employee->update($validated);
         return response()->json([
@@ -70,9 +101,9 @@ class EmployeeController extends Controller{
     }
     public function destroy(Employee $employee){
         Gate::authorize('delete', $employee);
-        // eliminar foto al borrar empleado
-        if ($employee->foto && \Storage::disk('public')->exists($employee->foto)) {
-            \Storage::disk('public')->delete($employee->foto);
+        // Eliminar foto al borrar empleado
+        if ($employee->foto && file_exists(public_path($employee->foto))) {
+            unlink(public_path($employee->foto));
         }
         $employee->delete();
         return response()->json([

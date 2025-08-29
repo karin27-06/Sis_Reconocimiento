@@ -39,7 +39,7 @@
             <template #body="{ data }">
                 <img
                     v-if="data.foto"
-                    :src="`/storage/${data.foto}`"
+                    :src="`/${data.foto}`" 
                     alt="Foto"
                     title="Ver foto"
                     class="w-12 h-12 rounded-full object-cover cursor-pointer"
@@ -97,8 +97,8 @@ const updateEmpleadoDialog = ref(false);
 
 function verFoto(foto) {
     if (!foto) return;
-    fotoPreview.value = `/storage/${foto}`; // ruta correcta
-    fotoDialog.value = true;               // abrir modal
+    fotoPreview.value = `/${foto}`; // ya no va en /storage
+    fotoDialog.value = true;        // abrir modal
 }
 
 const props = defineProps({

@@ -138,7 +138,9 @@ onMounted(() => {
                     <InputIcon>
                         <i class="pi pi-search" />
                     </InputIcon>
-                    <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar..." />
+                    <InputText v-model="globalFilterValue" @input="onGlobalSearch"
+                    placeholder="Buscar id, espacio, empleado..."
+                    class="w-80 md:w-96" />
                 </IconField>
                 <Select v-model="selectedEstadoSchedule" :options="estadoScheduleOptions" optionLabel="name"
                     placeholder="Estado" class="w-full md:w-auto" />
