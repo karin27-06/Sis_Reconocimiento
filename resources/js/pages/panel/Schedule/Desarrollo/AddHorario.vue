@@ -3,6 +3,10 @@
         <template #start>
             <Button label="Nuevo horario" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
         </template>
+                <template #end>
+            <!-- ToolsSpace para los botones de exportar e importar -->
+            <ToolsSchedule />       
+        </template>
     </Toolbar>
 
     <Dialog v-model:visible="scheduleDialog" :style="{ width: '700px' }" header="Registro de horario" :modal="true">
@@ -96,6 +100,7 @@ import Checkbox from 'primevue/checkbox';
 import Tag from 'primevue/tag';
 import { useToast } from 'primevue/usetoast';
 import Dropdown from 'primevue/dropdown';
+import ToolsSchedule from './toolsSchedule.vue';
 
 const toast = useToast();
 const submitted = ref(false);

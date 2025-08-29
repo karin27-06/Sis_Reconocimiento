@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SpaceController;
+use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Web\EmployeeTypeWebController;
 use App\Http\Controllers\Web\EmployeeWebController;
@@ -108,6 +109,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export-pdf-spaces', [SpacePDFController::class, 'exportPDF'])->name('export-pdf-spaces');
         // Ruta para importar desde Excel
         Route::post('/import-excel-spaces', [SpaceController::class, 'importExcel'])->name('import-excel-spaces');
+
+        #EXPORTACION Y IMPORTACION HORARIOS
+        Route::get('/export-excel-schedules', [ScheduleController::class, 'exportExcel'])->name('export-excel-schedules');
+        Route::get('/export-pdf-schedules', [SchedulePDFController::class, 'exportPDF'])->name('export-pdf-schedules');
+        // Ruta para importar desde Excel
+        Route::post('/import-excel-schedules', [ScheduleController::class, 'importExcel'])->name('import-excel-schedules');
 
         #EXPORTACION Y IMPORTACION TIPOS DE EMPLEADOS
         Route::get('/export-excel-employeeTypes', [EmployeeTypeController::class, 'exportExcel'])->name('export-excel-employeeTypes');
