@@ -1,5 +1,4 @@
-# Sistema de Reconocimiento facial, dactilar y voz – Laravel 12 + Vue.js + PrimeVue + PostgreSQL + Python
-
+# Sistema de Reconocimiento facial, dactilar y voz – Laravel 12 + Vue.js + PrimeVue + PostgreSQL + Python (2025)
 **Sistema de reconocimiento para espacios de trabajo** es una aplicación full-stack desarrollada por  
 [Karin27-06](https://github.com/karin27-06) y [PabloLupuX](https://github.com/PabloLupuX)
 utilizando **Laravel 12**, **Vue.js** y la librería de componentes **PrimeVue** para la interfaz de usuario, con base de datos **PostgreSQL**.
