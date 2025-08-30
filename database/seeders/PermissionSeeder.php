@@ -46,5 +46,10 @@ class PermissionSeeder extends Seeder{
         Permission::create(['name' => 'editar horarios']);
         Permission::create(['name' => 'eliminar horarios']);
         Permission::create(['name' => 'ver horarios']);
+        #movimientos
+        Permission::create(['name' => 'crear movimientos']);
+        Permission::create(['name' => 'editar movimientos']);
+        Permission::create(['name' => 'eliminar movimientos']);
+        Permission::create(['name' => 'ver movimientos']);
     }
 }

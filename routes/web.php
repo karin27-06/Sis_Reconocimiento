@@ -9,12 +9,14 @@ use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\UsuariosController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\MovementController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Web\EmployeeTypeWebController;
 use App\Http\Controllers\Web\EmployeeWebController;
+use App\Http\Controllers\Web\MovementWebController;
 use App\Http\Controllers\Web\ScheduleWebController;
 use App\Http\Controllers\Web\SpaceWebController;
 use App\Http\Controllers\Web\UsuarioWebController;
@@ -39,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/horarios', [ScheduleWebController::class, 'index'])->name('index.view');
     Route::get('/espacios', [SpaceWebController::class, 'index'])->name('index.view');
     Route::get('/empleados', [EmployeeWebController::class, 'index'])->name('index.view');
+    Route::get('/movimientos', [MovementWebController::class, 'index'])->name('index.view');
     Route::get('/tipo_empleados', [EmployeeTypeWebController::class, 'index'])->name('index.view');
     Route::get('/usuario', [UsuarioWebController::class, 'index'])->name('index.view');
     Route::get('/roles', [UsuarioWebController::class, 'roles'])->name('roles.view');
@@ -73,6 +76,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{employee}', [EmployeeController::class, 'show'])->name('empleados.show');
         Route::put('{employee}', [EmployeeController::class, 'update'])->name('empleados.update');
         Route::delete('{employee}', [EmployeeController::class, 'destroy'])->name('empleados.destroy');
+    });
+
+    #MOVIMIENTO => BACKEND
+    Route::prefix('movimiento')->group(function () {
+        Route::get('/', [MovementController::class, 'index'])->name('movimiento.index');
+        Route::post('/', [MovementController::class, 'store'])->name('movimientos.store');
+        Route::get('{movement}', [MovementController::class, 'show'])->name('movimientos.show');
+        Route::put('{movement}', [MovementController::class, 'update'])->name('movimientos.update');
+        Route::delete('{movement}', [MovementController::class, 'destroy'])->name('movimientos.destroy');
     });
 
     #TIPOS DE EMPLEADOS -> BACKEND
@@ -121,6 +133,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export-pdf-employeeTypes', [EmployeeTypePDFController::class, 'exportPDF'])->name('export-pdf-employeeTypes');
         // Ruta para importar desde Excel
         Route::post('/import-excel-employeeTypes', [EmployeeTypeController::class, 'importExcel'])->name('import-excel-employeeTypes');
+
+        #EXPORTACION Y IMPORTACION MOVIMIENTOS
+        Route::get('/export-excel-movements', [MovementController::class, 'exportExcel'])->name('export-excel-movements');
+        //Route::get('/export-pdf-movements', [MovementPDFController::class, 'exportPDF'])->name('export-pdf-movements');
+        // Ruta para importar desde Excel
+        Route::post('/import-excel-movements', [MovementController::class, 'importExcel'])->name('import-excel-movements');
 
         #EXPORTACION Y IMPORTACION EMPLEADOS
         Route::get('/export-excel-employees', [EmployeeController::class, 'exportExcel'])->name('export-excel-employees');

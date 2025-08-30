@@ -18,7 +18,8 @@ const model = computed(() => [
         label: 'Gestion de Trabajo',
         items: [
             hasPermission('ver espacios') && { label: 'Espacios', icon: 'pi pi-fw pi-briefcase', to: '/espacios' },
-            hasPermission('ver horarios') && { label: 'Horarios', icon: 'pi pi-fw pi-briefcase', to: '/horarios' },
+            hasPermission('ver horarios') && { label: 'Horarios', icon: 'pi pi-fw pi-clock', to: '/horarios' },
+            hasPermission('ver movimientos') && { label: 'Movimientos', icon: 'pi pi-fw pi-arrow-right-arrow-left', to: '/movimientos' },
         ].filter(Boolean),
     },
     {
