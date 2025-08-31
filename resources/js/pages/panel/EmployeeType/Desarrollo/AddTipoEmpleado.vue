@@ -9,7 +9,7 @@
         </template>
     </Toolbar>
 
-    <Dialog v-model:visible="tipoEmpleadoDialog" :style="{ width: '600px' }" header="Registro de tipo de empleado" :modal="true">
+    <Dialog v-model:visible="tipoEmpleadoDialog" :style="{ width: '90%', maxWidth: '600px' }" header="Registro de tipo de empleado" :modal="true">
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-9">

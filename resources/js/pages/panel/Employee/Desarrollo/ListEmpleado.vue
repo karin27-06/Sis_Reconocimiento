@@ -1,60 +1,63 @@
 <template>
     <DataTable ref="dt" v-model:selection="selectedEmpleados" :value="empleados" dataKey="id"
-        :paginator="true" :rows="pagination.perPage" :totalRecords="pagination.total" :loading="loading"
-        :lazy="true" @page="onPage" :rowsPerPageOptions="[15, 20, 25]" scrollable scrollHeight="574px"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} empleados">
+    :paginator="true" :rows="pagination.perPage" :totalRecords="pagination.total" :loading="loading"
+    :lazy="true" @page="onPage" :rowsPerPageOptions="[15, 20, 25]" 
+    responsiveLayout="scroll" scrollHeight="auto"
+    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} empleados">
 
-        <template #header>
-            <div class="flex flex-wrap gap-2 items-center justify-between">
-                <h4 class="m-0">EMPLEADOS</h4>
-                <div class="flex flex-wrap gap-2">
-                    <IconField>
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar..." />
-                    </IconField>
-                    <Select v-model="selectedEstadoEmpleado" :options="estadoEmpleadoOptions" optionLabel="name"
-                        placeholder="Estado" class="w-full md:w-auto" />
-                    <Button title="Refrescar" icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEmpleado" />
-                </div>
+    <template #header>
+        <div class="flex flex-wrap gap-2 items-center justify-between">
+            <h4 class="m-0">EMPLEADOS</h4>
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <IconField class="flex-1 md:flex-none">
+                    <InputIcon>
+                        <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar..." class="w-full" />
+                </IconField>
+                <Select v-model="selectedEstadoEmpleado" :options="estadoEmpleadoOptions" optionLabel="name"
+                    placeholder="Estado" class="w-full md:w-auto" />
+                <Button title="Refrescar" icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEmpleado" />
             </div>
-        </template>
+        </div>
+    </template>
 
-        <Column selectionMode="multiple" style="width: 1rem" :exportable="false" />
-        <Column field="name" header="Nombre" sortable style="min-width: 12rem" />
-        <Column field="apellido" header="Apellido" sortable style="min-width: 12rem" />
-        <Column field="codigo" header="Código" sortable style="min-width: 10rem" />
-        <Column field="empleadoType" header="Tipo de Empleado" sortable style="min-width: 12rem" />
-        <Column field="idHuella" header="ID Huella" sortable style="min-width: 8rem" />
-        <Column field="creacion" header="Creación" sortable style="min-width: 13rem" />
-        <Column field="actualizacion" header="Actualización" sortable style="min-width: 13rem" />
-        <Column field="state" header="Estado" sortable style="min-width: 6rem">
-            <template #body="{ data }">
-                <Tag :value="data.state ? 'Activo' : 'Inactivo'" :severity="getSeverity(data.state)" />
-            </template>
-        </Column>
-        <Column field="foto" header="Foto" style="min-width: 8rem">
-            <template #body="{ data }">
-                <img
-                    v-if="data.foto"
-                    :src="`/${data.foto}`" 
-                    alt="Foto"
-                    title="Ver foto"
-                    class="w-12 h-12 rounded-full object-cover cursor-pointer"
-                    @click="verFoto(data.foto)"
-                />
-            </template>
-        </Column>
-        <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 8rem">
-            <template #body="slotProps">
-                <Button title="Editar empleado" icon="pi pi-pencil" outlined rounded class="mr-2" @click="editEmpleado(slotProps.data)" />
+    <Column selectionMode="multiple" style="width: 1rem" :exportable="false" />
+    <Column field="name" header="Nombre" sortable style="min-width: 8rem" />
+    <Column field="apellido" header="Apellido" sortable style="min-width: 8rem" />
+    <Column field="codigo" header="Código" sortable style="min-width: 6rem" />
+    <Column field="empleadoType" header="Tipo de Empleado" sortable style="min-width: 10rem" />
+    <Column field="idHuella" header="ID Huella" sortable style="min-width: 6rem" />
+    <Column field="creacion" header="Creación" sortable style="min-width: 10rem" />
+    <Column field="actualizacion" header="Actualización" sortable style="min-width: 10rem" />
+    <Column field="state" header="Estado" sortable style="min-width: 6rem">
+        <template #body="{ data }">
+            <Tag :value="data.state ? 'Activo' : 'Inactivo'" :severity="getSeverity(data.state)" />
+        </template>
+    </Column>
+    <Column field="foto" header="Foto" style="min-width: 6rem">
+        <template #body="{ data }">
+            <img
+                v-if="data.foto"
+                :src="`/${data.foto}`" 
+                alt="Foto"
+                title="Ver foto"
+                class="w-12 h-12 rounded-full object-cover cursor-pointer"
+                @click="verFoto(data.foto)"
+            />
+        </template>
+    </Column>
+    <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 8rem">
+        <template #body="slotProps">
+            <div class="flex flex-wrap gap-2">
+                <Button title="Editar empleado" icon="pi pi-pencil" outlined rounded @click="editEmpleado(slotProps.data)" />
                 <Button title="Eliminar empleado" icon="pi pi-trash" outlined rounded severity="danger"
                     @click="confirmDeleteEmpleado(slotProps.data)" />
-            </template>
-        </Column>
-    </DataTable>
+            </div>
+        </template>
+    </Column>
+</DataTable>
 
     <DeleteEmpleado v-model:visible="deleteEmpleadoDialog" :empleado="empleado" @deleted="handleEmpleadoDeleted" />
     <UpdateEmpleado v-model:visible="updateEmpleadoDialog" :empleadoId="selectedEmpleadoId"

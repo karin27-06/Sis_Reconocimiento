@@ -40,7 +40,7 @@ async function deleterol() {
 </script>
 
 <template>
-    <Dialog v-model:visible="localVisible" :style="{ width: '450px' }" header="Confirmar eliminación" :modal="true"
+    <Dialog v-model:visible="localVisible" :style="{ width: '90%', maxWidth: '450px' }" header="Confirmar eliminación" :modal="true"
         @update:visible="closeDialog">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle text-3xl text-red-500" />

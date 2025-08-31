@@ -1,5 +1,11 @@
 <template>
-    <Dialog v-model:visible="dialogVisible" :style="{ width: '600px' }" header="Editar Movimiento" :modal="true">
+    <Dialog 
+        v-model:visible="dialogVisible" 
+        header="Editar Movimiento" 
+        :modal="true"
+        class="w-full max-w-full sm:max-w-lg"
+        :style="{ width: '95vw', maxWidth: '600px' }"
+    >
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
 
@@ -24,7 +30,7 @@
                 <!-- Tipo -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Tipo <span class="text-red-500">*</span></label>
-                    <InputText v-model.trim="movimiento.idTipo" placeholder="Ingrese tipo de movimiento"
+                    <InputText v-model.trim="movimiento.idTipo" placeholder="Ingrese tipo de movimiento" class="w-full"
                         :class="{ 'p-invalid': serverErrors.idTipo }"
                     />
                     <small v-if="submitted && !movimiento.idTipo" class="text-red-500">El tipo es obligatorio.</small>
@@ -32,21 +38,21 @@
                 </div>
 
                 <!-- Reconocido -->
-                <div class="col-span-6">
-                    <label class="block font-bold mb-2">Reconocido <span class="text-red-500">*</span></label>
+                <div class="col-span-12 sm:col-span-6 flex items-center gap-2">
                     <Checkbox v-model="movimiento.reconocido" :binary="true" />
+                    <label class="font-bold">Reconocido</label>
                 </div>
 
                 <!-- Acceso -->
-                <div class="col-span-6">
-                    <label class="block font-bold mb-2">Acceso <span class="text-red-500">*</span></label>
+                <div class="col-span-12 sm:col-span-6 flex items-center gap-2">
                     <Checkbox v-model="movimiento.access" :binary="true" />
+                    <label class="font-bold">Acceso</label>
                 </div>
 
                 <!-- Error -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Error</label>
-                    <InputText v-model.trim="movimiento.error" maxlength="3" placeholder="Ingrese código de error"
+                    <InputText v-model.trim="movimiento.error" maxlength="3" placeholder="Ingrese código de error" class="w-full"
                         :class="{ 'p-invalid': serverErrors.error }"
                     />
                     <small v-if="serverErrors.error" class="text-red-500">{{ serverErrors.error[0] }}</small>
@@ -55,7 +61,7 @@
                 <!-- Fechas -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Fecha Envío ESP32</label>
-                    <InputText type="datetime-local" v-model="movimiento.fechaEnvioESP32"
+                    <InputText type="datetime-local" v-model="movimiento.fechaEnvioESP32" class="w-full"
                         :class="{ 'p-invalid': serverErrors.fechaEnvioESP32 }"
                     />
                     <small v-if="serverErrors.fechaEnvioESP32" class="text-red-500">{{ serverErrors.fechaEnvioESP32[0] }}</small>
@@ -63,7 +69,7 @@
 
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Fecha Recepción</label>
-                    <InputText type="datetime-local" v-model="movimiento.fechaRecepcion"
+                    <InputText type="datetime-local" v-model="movimiento.fechaRecepcion" class="w-full"
                         :class="{ 'p-invalid': serverErrors.fechaRecepcion }"
                     />
                     <small v-if="serverErrors.fechaRecepcion" class="text-red-500">{{ serverErrors.fechaRecepcion[0] }}</small>
@@ -71,7 +77,7 @@
 
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Fecha Reconocimiento</label>
-                    <InputText type="datetime-local" v-model="movimiento.fechaReconocimiento"
+                    <InputText type="datetime-local" v-model="movimiento.fechaReconocimiento" class="w-full"
                         :class="{ 'p-invalid': serverErrors.fechaReconocimiento }"
                     />
                     <small v-if="serverErrors.fechaReconocimiento" class="text-red-500">{{ serverErrors.fechaReconocimiento[0] }}</small>
@@ -81,7 +87,7 @@
         </div>
 
         <template #footer>
-            <Button label="Cancelar" icon="pi pi-times" text @click="dialogVisible" />
+            <Button label="Cancelar" icon="pi pi-times" text class="mr-2" @click="dialogVisible = false" />
             <Button label="Guardar" icon="pi pi-check" @click="updateMovimiento" :loading="loading" />
         </template>
     </Dialog>

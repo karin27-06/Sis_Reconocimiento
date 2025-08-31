@@ -141,17 +141,19 @@ onMounted(() => {
         scrollHeight="574px"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} tipos de empleados"
+        class="w-full"
     >
         <template #header>
             <div class="flex flex-wrap gap-2 items-center justify-between">
                 <h4 class="m-0">Tipos Empleados</h4>
-                <div class="flex flex-wrap gap-2">
-                    <IconField>
+                <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                    <IconField class="flex-1 min-w-[150px]">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar tipo empleado..." />
+                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar tipo empleado..." class="w-full"/>
                     </IconField>
+
                     <Select
                         v-model="selectedEstadoTipoEmpleado"
                         :options="estadoTipoEmpleadoOptions"
@@ -175,8 +177,10 @@ onMounted(() => {
         </Column>
         <Column field="accions" header="Acciones" :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
-                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editTipoEmpleado(slotProps.data)" />
-                <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteTipoEmpleado(slotProps.data)" />
+                <div class="flex flex-wrap gap-1">
+                    <Button icon="pi pi-pencil" outlined rounded class="mr-1" @click="editTipoEmpleado(slotProps.data)" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteTipoEmpleado(slotProps.data)" />
+                </div>
             </template>
         </Column>
     </DataTable>

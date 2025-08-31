@@ -145,26 +145,43 @@ onMounted(() => {
         scrollHeight="574px"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} movimientos"
+        class="w-full"
     >
         <template #header>
-            <div class="flex flex-wrap gap-2 items-center justify-between">
+            <div class="flex flex-col md:flex-row flex-wrap gap-2 items-start md:items-center justify-between">
                 <h4 class="m-0">MOVIMIENTOS</h4>
-                <div class="flex flex-wrap gap-2">
-                    <IconField>
+                <div class="flex flex-col md:flex-row flex-wrap gap-2 w-full md:w-auto">
+                    <IconField class="w-full md:w-auto">
                         <InputIcon>
                             <i class="pi pi-search" />
                         </InputIcon>
-                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar por espacio y tipo..." class="w-80 md:w-90"/>
+                        <InputText 
+                            v-model="globalFilterValue" 
+                            @input="onGlobalSearch" 
+                            placeholder="Buscar por espacio y tipo..." 
+                            class="w-full md:w-80"
+                        />
                     </IconField>
-                    <Select v-model="selectedReconocido" :options="reconocidoOptions" optionLabel="name" placeholder="Reconocido" class="w-full md:w-auto" />
-                    <Select v-model="selectedAccess" :options="accessOptions" optionLabel="name" placeholder="Acceso" class="w-full md:w-auto" />
-
-                    <Button icon="pi pi-refresh" outlined rounded @click="loadMovimientos" />
+                    <Select 
+                        v-model="selectedReconocido" 
+                        :options="reconocidoOptions" 
+                        optionLabel="name" 
+                        placeholder="Reconocido" 
+                        class="w-full md:w-auto" 
+                    />
+                    <Select 
+                        v-model="selectedAccess" 
+                        :options="accessOptions" 
+                        optionLabel="name" 
+                        placeholder="Acceso" 
+                        class="w-full md:w-auto" 
+                    />
+                    <Button icon="pi pi-refresh" outlined rounded class="w-full md:w-auto" @click="loadMovimientos" />
                 </div>
             </div>
         </template>
 
-        <Column selectionMode="multiple" style="width: 1rem"></Column>
+        <Column selectionMode="multiple" style="width: 1rem" />
         <Column field="Espacio" header="Espacio" sortable style="min-width: 12rem" />
         <Column field="idTipo" header="Tipo" sortable style="min-width: 10rem" />
         <Column field="reconocido" header="Reconocido" sortable style="min-width: 8rem">
@@ -185,13 +202,20 @@ onMounted(() => {
         <Column field="actualizacion" header="Actualización" sortable style="min-width: 13rem" />
         <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 8rem">
             <template #body="slotProps">
-                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editMovimiento(slotProps.data)" />
-                <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteMovimiento(slotProps.data)" />
+                <Button icon="pi pi-pencil" outlined rounded class="mr-2 mb-2 md:mb-0" @click="editMovimiento(slotProps.data)" />
+                <Button icon="pi pi-trash" outlined rounded severity="danger" class="mb-2 md:mb-0" @click="confirmDeleteMovimiento(slotProps.data)" />
             </template>
         </Column>
     </DataTable>
 
-    <DeleteMovimiento v-model:visible="deleteMovimientoDialog" :movimiento="movimiento" @deleted="handleMovimientoDeleted" />
-    <UpdateMovimiento v-model:visible="updateMovimientoDialog" :movimientoId="selectedMovimientoId"
-    @updated="handleMovimientoUpdated" />
+    <DeleteMovimiento 
+        v-model:visible="deleteMovimientoDialog" 
+        :movimiento="movimiento" 
+        @deleted="handleMovimientoDeleted" 
+    />
+    <UpdateMovimiento 
+        v-model:visible="updateMovimientoDialog" 
+        :movimientoId="selectedMovimientoId"
+        @updated="handleMovimientoUpdated" 
+    />
 </template>

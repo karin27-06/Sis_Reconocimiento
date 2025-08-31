@@ -86,106 +86,157 @@ const updatePassword = () => {
 </script>
 
 <template>
-    <FloatingConfigurator />
+  <FloatingConfigurator />
 
-    <Head title="Password" />
-    <div
-        class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
-        <div class="flex flex-col items-center justify-center">
-            <div
-                style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
-                    <div class="text-center mb-8">
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Actualizar
-                            Contraseña</div>
-                        <span class="text-muted-color font-medium">Asegúrate de usar una contraseña segura y difícil de
-                            adivinar.</span>
-                    </div>
-
-                    <form @submit.prevent="updatePassword">
-                        <div>
-                            <label for="current_password"
-                                class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Contraseña
-                                Actual</label>
-                            <Password id="current_password" ref="currentPasswordInput" v-model="form.current_password"
-                                class="w-full md:w-[30rem] mb-1" toggleMask inputClass="w-full" :feedback="false" />
-                            <small v-if="form.errors.current_password || (formSubmitted && !form.current_password)"
-                                class="p-error">
-                                {{ form.errors.current_password || 'Este campo es obligatorio' }}
-                            </small>
-                            <Message v-if="form.errors.current_password" severity="error" :closable="false"
-                                class="mt-2">
-                                {{ form.errors.current_password }}
-                            </Message>
-                        </div>
-                        <div>
-                            <label for="password"
-                                class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2 mt-4">Nueva
-                                Contraseña</label>
-                            <Password id="password" ref="passwordInput" v-model="form.password" toggleMask
-                                class="w-full md:w-[30rem] mb-1" />
-                            <small v-if="form.errors.password || (formSubmitted && !form.password)" class="p-error">
-                                {{ form.errors.password || 'Este campo es obligatorio' }}
-                            </small>
-                        </div>
-                        <div>
-                            <label for="password_confirmation"
-                                class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2 mt-4">Confirmar
-                                Contraseña</label>
-                            <Password id="password_confirmation" v-model="form.password_confirmation" toggleMask
-                                class="w-full md:w-[30rem] mb-1" inputClass="w-full" :feedback="false" />
-                            <small
-                                v-if="form.errors.password_confirmation || (formSubmitted && !form.password_confirmation)"
-                                class="p-error">
-                                {{ form.errors.password_confirmation || 'Este campo es obligatorio' }}
-                            </small>
-                        </div>
-                        <br>
-                        <Message v-if="errorMessage" severity="error" :closable="false" class="mb-4 w-full">
-                            {{ errorMessage }}
-                        </Message>
-                        <Button type="submit" label="Guardar Contraseña" class="w-full" :loading="form.processing"
-                            @click="logFormState" />
-                        <Message v-if="form.recentlySuccessful" severity="success" :closable="false" :life="3000">
-                            ¡Contraseña actualizada!
-                        </Message>
-                    </form>
-                </div>
-            </div>
+  <Head title="Password" />
+  <div
+    class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen w-full px-4 sm:px-6"
+  >
+    <div class="flex flex-col items-center justify-center w-full max-w-md">
+      <div
+        class="w-full bg-surface-0 dark:bg-surface-900 rounded-3xl shadow-lg py-10 px-6 sm:py-14 sm:px-12"
+      >
+        <!-- Encabezado -->
+        <div class="text-center mb-8">
+          <h1 class="text-surface-900 dark:text-surface-0 text-2xl sm:text-3xl font-semibold mb-2">
+            Actualizar Contraseña
+          </h1>
+          <p class="text-muted-color text-sm sm:text-base">
+            Asegúrate de usar una contraseña segura y difícil de adivinar.
+          </p>
         </div>
+
+        <!-- Formulario -->
+        <form @submit.prevent="updatePassword" class="space-y-6">
+          <!-- Contraseña Actual -->
+          <div>
+            <label
+              for="current_password"
+              class="block text-surface-900 dark:text-surface-0 text-base sm:text-lg font-medium mb-1"
+            >
+              Contraseña Actual
+            </label>
+            <Password
+              id="current_password"
+              ref="currentPasswordInput"
+              v-model="form.current_password"
+              class="w-full"
+              toggleMask
+              inputClass="w-full"
+              :feedback="false"
+            />
+            <small
+            v-if="form.errors.current_password || (formSubmitted && !form.current_password)"
+            class="text-red-600 text-sm font-medium"
+            >
+            {{ form.errors.current_password || 'Este campo es obligatorio' }}
+            </small>
+            <Message
+              v-if="form.errors.current_password"
+              severity="error"
+              :closable="false"
+              class="mt-2 text-sm"
+            >
+              {{ form.errors.current_password }}
+            </Message>
+          </div>
+
+          <!-- Nueva Contraseña -->
+          <div>
+            <label
+              for="password"
+              class="block text-surface-900 dark:text-surface-0 font-medium text-base sm:text-lg mb-1"
+            >
+              Nueva Contraseña
+            </label>
+            <Password
+              id="password"
+              ref="passwordInput"
+              v-model="form.password"
+              toggleMask
+              class="w-full"
+              inputClass="w-full"
+            />
+            <small
+              v-if="form.errors.password || (formSubmitted && !form.password)"
+              class="text-red-600 text-sm font-medium"
+            >
+              {{ form.errors.password || 'Este campo es obligatorio' }}
+            </small>
+          </div>
+
+          <!-- Confirmar Contraseña -->
+          <div>
+            <label
+              for="password_confirmation"
+              class="block text-surface-900 dark:text-surface-0 font-medium text-base sm:text-lg mb-1"
+            >
+              Confirmar Contraseña
+            </label>
+            <Password
+              id="password_confirmation"
+              v-model="form.password_confirmation"
+              toggleMask
+              class="w-full"
+              inputClass="w-full"
+              :feedback="false"
+            />
+            <small
+              v-if="form.errors.password_confirmation || (formSubmitted && !form.password_confirmation)"
+              class="text-red-600 text-sm font-medium"
+            >
+              {{ form.errors.password_confirmation || 'Este campo es obligatorio' }}
+            </small>
+          </div>
+
+          <!-- Mensaje de error general -->
+          <Message
+            v-if="errorMessage"
+            severity="error"
+            :closable="false"
+            class="mb-4 w-full text-sm"
+          >
+            {{ errorMessage }}
+          </Message>
+
+          <!-- Botón -->
+          <Button
+            type="submit"
+            label="Guardar Contraseña"
+            class="w-full"
+            :loading="form.processing"
+            @click="logFormState"
+          />
+
+          <!-- Mensaje de éxito -->
+          <Message
+            v-if="form.recentlySuccessful"
+            severity="success"
+            :closable="false"
+            :life="3000"
+            class="w-full text-sm"
+          >
+            ¡Contraseña actualizada!
+          </Message>
+        </form>
+      </div>
     </div>
+  </div>
 </template>
+
 <style scoped>
-.pi-eye {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
-
+.pi-eye,
 .pi-eye-slash {
-    transform: scale(1.6);
-    margin-right: 1rem;
+  transform: scale(1.3);
+  margin-right: 0.5rem;
 }
 
-:deep(.p-password) {
-    width: 100%;
-}
-
+:deep(.p-password),
 :deep(.p-password-input) {
-    width: 100%;
+  width: 100%;
 }
 
 :deep(.p-invalid) {
-    border-color: var(--red-500);
-}
-
-:deep(.p-message) {
-    border-width: 0;
-    border-radius: 6px;
-}
-
-:deep(.p-inline-message) {
-    border-width: 0;
-    padding: 0.3rem 0.5rem;
-    margin-top: 0.25rem;
+  border-color: var(--red-500);
 }
 </style>

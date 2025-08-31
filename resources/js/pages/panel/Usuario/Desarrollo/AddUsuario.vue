@@ -7,7 +7,7 @@
         </template>
     </Toolbar>
 
-    <Dialog v-model:visible="usuarioDialog" :style="{ width: '600px' }" header="Registro de usuarios" :modal="true">
+    <Dialog v-model:visible="usuarioDialog" :style="{ width: '95vw', maxWidth: '600px' }" header="Registro de usuarios" :modal="true">
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-9">

@@ -1,8 +1,13 @@
 <template>
-    <div class="flex flex-wrap items-center gap-3 p-2">
+    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 p-2 w-full">
         <!-- Exportar Excel -->
-        <a href="/panel/reports/export-excel-employeeTypes" download>
-            <Button variant="outlined" size="small" class="bg-green-600 hover:bg-green-700 text-white" icon="pi pi-file-excel" label="Exportar a Excel" title="Exportar a Excel">
+        <a href="/panel/reports/export-excel-employeeTypes" download class="w-full sm:w-auto">
+            <Button variant="outlined" 
+                size="small" 
+                class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white" 
+                icon="pi pi-file-excel" 
+                label="Exportar a Excel" 
+                title="Exportar a Excel">
             </Button>
         </a>
 
@@ -14,8 +19,13 @@
         </div> -->
 
         <!-- Exportar PDF -->
-        <a href="/panel/reports/export-pdf-employeeTypes" download>
-            <Button variant="outlined" size="small" class="bg-red-600 hover:bg-red-700 text-white" icon="pi pi-file-pdf" label="Exportar a PDF" title="Exportar PDF">
+        <a href="/panel/reports/export-pdf-employeeTypes" download class="w-full sm:w-auto">
+            <Button variant="outlined" 
+                size="small" 
+                class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white" 
+                icon="pi pi-file-pdf" 
+                label="Exportar a PDF" 
+                title="Exportar PDF">
             </Button>
         </a>
     </div>
