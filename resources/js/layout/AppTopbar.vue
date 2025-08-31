@@ -37,8 +37,8 @@ const cancelLogout = () => {
       </button>
       <!-- Logo con ícono + texto -->
       <Link href="/dashboard" class="layout-topbar-logo flex items-center gap-2">
-        <FingerPrintIcon class="h-12 w-12 text-primary" />
-        <span class="font-serif text-lg font-semibold">Sistema de Reconocimiento</span>
+          <FingerPrintIcon class="h-8 w-8 text-primary" />
+          <span class="font-serif text-base font-semibold">Sistema de Reconocimiento</span>
       </Link>
     </div>
 
