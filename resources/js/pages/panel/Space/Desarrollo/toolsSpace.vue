@@ -1,22 +1,43 @@
 <template>
-    <div class="flex flex-wrap items-center gap-3 p-2">
+    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 p-2 w-full">
         <!-- Exportar Excel -->
-        <a href="/panel/reports/export-excel-spaces" download>
-            <Button variant="outlined" size="small" class="bg-green-600 hover:bg-green-700 text-white" icon="pi pi-file-excel" label="Exportar a Excel" title="Exportar a Excel">
-            </Button>
+        <a href="/panel/reports/export-excel-spaces" download class="w-full sm:w-auto">
+            <Button 
+                variant="outlined" 
+                size="small" 
+                class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white" 
+                icon="pi pi-file-excel" 
+                label="Exportar a Excel" 
+                title="Exportar a Excel"
+            />
         </a>
 
-        <!-- Importar Excel 
-        <div>
+        <!-- Importar Excel -->
+        <!--
+        <div class="w-full sm:w-auto">
             <input type="file" ref="fileRef" accept=".xlsx" class="hidden" @change="handleFileChange"/>
-            <Button @click="handleImportClick" variant="outlined" size="small" class="bg-blue-600 hover:bg-blue-700 text-white" icon="pi pi-upload" label="Importar Excel" title="Importar Excel">
-            </Button> 
-        </div> -->
+            <Button 
+                @click="handleImportClick" 
+                variant="outlined" 
+                size="small" 
+                class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white" 
+                icon="pi pi-upload" 
+                label="Importar Excel" 
+                title="Importar Excel"
+            />
+        </div>
+        -->
 
         <!-- Exportar PDF -->
-        <a href="/panel/reports/export-pdf-spaces" download>
-            <Button variant="outlined" size="small" class="bg-red-600 hover:bg-red-700 text-white" icon="pi pi-file-pdf" label="Exportar a PDF" title="Exportar PDF">
-            </Button>
+        <a href="/panel/reports/export-pdf-spaces" download class="w-full sm:w-auto">
+            <Button 
+                variant="outlined" 
+                size="small" 
+                class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white" 
+                icon="pi pi-file-pdf" 
+                label="Exportar a PDF" 
+                title="Exportar PDF"
+            />
         </a>
     </div>
 </template>

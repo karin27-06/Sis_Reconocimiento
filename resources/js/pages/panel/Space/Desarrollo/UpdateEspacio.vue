@@ -98,42 +98,63 @@ const updateEspacio = async () => {
 </script>
 
 <template>
-    <Dialog v-model:visible="dialogVisible" header="Editar espacio de trabajo" modal :closable="true" :style="{ width: '600px' }">
-        <div class="flex flex-col gap-6">
-            <div class="grid grid-cols-12 gap-4">
-                <div class="col-span-10">
-                    <label class="block font-bold mb-2">Nombre <span class="text-red-500">*</span></label>
-                    <InputText
-                        v-model="espacio.name"
-                        required
-                        maxlength="150"
-                        fluid
-                        :class="{ 'p-invalid': serverErrors.name }"
-                    />
-                    <small v-if="serverErrors.name" class="text-red-500">{{ serverErrors.name[0] }}</small>
-                </div>
-                 <div class="col-span-2">
-                    <label class="block font-bold mb-2">Estado <span class="text-red-500">*</span></label>
-                    <div class="flex items-center gap-3">
-                        <Checkbox v-model="espacio.state" :binary="true" />
-                        <Tag :value="espacio.state ? 'Activo' : 'Inactivo'" :severity="espacio.state ? 'success' : 'danger'" />
-                    </div>
-                </div>
-                <div class="col-span-12">
-                    <label class="block font-bold mb-3">Descripción</label>
-                    <Textarea
-                        v-model="espacio.description"
-                        maxlength="255"
-                        rows="4" autoResize fluid
-                        :class="{ 'p-invalid': serverErrors.description }" 
-                    />
-                    <small v-if="serverErrors.description" class="text-red-500">{{ serverErrors.description[0] }}</small>
+    <Dialog 
+    v-model:visible="dialogVisible" 
+    header="Editar espacio de trabajo" 
+    modal 
+    :closable="true" 
+    :style="{ width: '95vw', maxWidth: '600px' }"
+>
+    <div class="flex flex-col gap-6">
+        <div class="grid grid-cols-12 gap-4">
+
+            <!-- Nombre -->
+            <div class="col-span-12 md:col-span-10">
+                <label class="block font-bold mb-2">Nombre <span class="text-red-500">*</span></label>
+                <InputText
+                    v-model="espacio.name"
+                    required
+                    maxlength="150"
+                    fluid
+                    class="w-full"
+                    :class="{ 'p-invalid': serverErrors.name }"
+                />
+                <small v-if="serverErrors.name" class="text-red-500">{{ serverErrors.name[0] }}</small>
+            </div>
+
+            <!-- Estado -->
+            <div class="col-span-12 md:col-span-2 flex flex-col">
+                <label class="block font-bold mb-2">Estado <span class="text-red-500">*</span></label>
+                <div class="flex items-center gap-3">
+                    <Checkbox v-model="espacio.state" :binary="true" />
+                    <Tag :value="espacio.state ? 'Activo' : 'Inactivo'" :severity="espacio.state ? 'success' : 'danger'" />
                 </div>
             </div>
+
+            <!-- Descripción -->
+            <div class="col-span-12">
+                <label class="block font-bold mb-3">Descripción</label>
+                <Textarea
+                    v-model="espacio.description"
+                    maxlength="255"
+                    rows="4"
+                    autoResize
+                    fluid
+                    class="w-full"
+                    :class="{ 'p-invalid': serverErrors.description }" 
+                />
+                <small v-if="serverErrors.description" class="text-red-500">{{ serverErrors.description[0] }}</small>
+            </div>
+
         </div>
-        <template #footer>
-            <Button label="Cancelar" icon="pi pi-times" text @click="dialogVisible = false" />
-            <Button label="Guardar" icon="pi pi-check" @click="updateEspacio" :loading="loading" />
-        </template>
-    </Dialog>
+    </div>
+
+    <!-- Footer -->
+    <template #footer>
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:justify-end">
+            <Button label="Cancelar" icon="pi pi-times" text class="w-full sm:w-auto" @click="dialogVisible = false" />
+            <Button label="Guardar" icon="pi pi-check" @click="updateEspacio" :loading="loading" class="w-full sm:w-auto" />
+        </div>
+    </template>
+</Dialog>
 </template>

@@ -125,28 +125,56 @@ onMounted(() => {
 </script>
 
 <template>
-    <DataTable ref="dt" v-model:selection="selectedEspacios" :value="espacios" dataKey="id" :paginator="true"
-        :rows="pagination.perPage" :totalRecords="pagination.total" :loading="loading" :lazy="true" @page="onPage"
-        :rowsPerPageOptions="[15, 20, 25]" scrollable scrollHeight="574px"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} espacios">
+    <DataTable 
+    ref="dt" 
+    v-model:selection="selectedEspacios" 
+    :value="espacios" 
+    dataKey="id" 
+    :paginator="true"
+    :rows="pagination.perPage" 
+    :totalRecords="pagination.total" 
+    :loading="loading" 
+    :lazy="true" 
+    @page="onPage"
+    :rowsPerPageOptions="[15, 20, 25]" 
+    scrollable 
+    scrollDirection="both" 
+    responsiveLayout="scroll" 
+    class="w-full text-sm sm:text-base"
+    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} espacios">
 
         <template #header>
-            <div class="flex flex-wrap gap-2 items-center justify-between">
-                <h4 class="m-0">ESPACIOS DE TRABAJO</h4>
-                <div class="flex flex-wrap gap-2">
-                    <IconField>
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText v-model="globalFilterValue" @input="onGlobalSearch" placeholder="Buscar espacio..." />
-                    </IconField>
-                    <Select v-model="selectedEstadoEspacio" :options="estadoEspacioOptions" optionLabel="name"
-                        placeholder="Estado" class="w-full md:w-auto" />
-                    <Button title="Refrescar" icon="pi pi-refresh" outlined rounded aria-label="Refresh" @click="loadEspacio" />
-                </div>
-            </div>
-        </template>
+    <div class="flex flex-col md:flex-row gap-2 items-start md:items-center justify-between w-full">
+        <h4 class="m-0 text-base sm:text-lg md:text-xl">ESPACIOS DE TRABAJO</h4>
+        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <IconField class="w-full sm:w-64">
+                <InputIcon>
+                    <i class="pi pi-search" />
+                </InputIcon>
+                <InputText 
+                    v-model="globalFilterValue" 
+                    @input="onGlobalSearch" 
+                    placeholder="Buscar espacio..." 
+                    class="w-full" />
+            </IconField>
+            <Select 
+                v-model="selectedEstadoEspacio" 
+                :options="estadoEspacioOptions" 
+                optionLabel="name"
+                placeholder="Estado" 
+                class="w-full sm:w-40" />
+            <Button 
+                title="Refrescar" 
+                icon="pi pi-refresh" 
+                outlined 
+                rounded 
+                aria-label="Refresh" 
+                class="w-full sm:w-auto" 
+                @click="loadEspacio" />
+        </div>
+    </div>
+</template>
 
         <Column selectionMode="multiple" style="width: 1rem" :exportable="false"></Column>
         <Column field="name" header="Nombre" sortable style="min-width: 12rem" />

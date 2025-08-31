@@ -197,7 +197,7 @@ onMounted(() => {
 
 <template>
     <Dialog v-model:visible="dialogVisible" header="Editar Usuario" modal :closable="true" :closeOnEscape="true"
-        :style="{ width: '600px' }">
+        :style="{ width: '95vw', maxWidth: '600px' }">
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-9">

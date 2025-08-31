@@ -1,5 +1,5 @@
 <template>
-    <Dialog :visible="visible" @update:visible="emit('update:visible', $event)" :style="{ width: '1000px' }"
+    <Dialog :visible="visible" @update:visible="emit('update:visible', $event)" :style="{ width: '95vw', maxWidth: '1000px' }"
         header="Editar Roles y Permisos" modal>
         <div class="flex flex-col gap-6">
             <div>

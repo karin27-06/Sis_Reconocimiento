@@ -1,33 +1,40 @@
 <template>
-<Dialog v-model:visible="dialogVisible" header="Editar Horario" modal :closable="true" :style="{ width: '700px' }">
+<Dialog 
+    v-model:visible="dialogVisible" 
+    header="Editar Horario" 
+    modal 
+    :closable="true" 
+    :style="{ width: '95vw', maxWidth: '700px' }"
+>
     <div class="flex flex-col gap-6">
         <div class="grid grid-cols-12 gap-4">
+
             <!-- Fecha -->
-            <div class="col-span-4">
+            <div class="col-span-12 md:col-span-4">
                 <label class="block font-bold mb-2">Fecha <span class="text-red-500">*</span></label>
-                <InputText v-model="schedule.fechaFormatted" type="date" required fluid :class="{ 'p-invalid': serverErrors.fecha }" />
+                <InputText v-model="schedule.fechaFormatted" type="date" required fluid class="w-full" :class="{ 'p-invalid': serverErrors.fecha }" />
                 <small v-if="submitted && !schedule.fechaFormatted" class="text-red-500">La fecha es obligatoria.</small>
                 <small v-if="serverErrors.fecha" class="text-red-500">{{ serverErrors.fecha[0] }}</small>
             </div>
 
             <!-- Fecha Inicio -->
-            <div class="col-span-4">
+            <div class="col-span-12 md:col-span-4">
                 <label class="block font-bold mb-2">Fecha y Hora Inicio <span class="text-red-500">*</span></label>
-                <InputText v-model="schedule.fechaInicioFormatted" type="datetime-local" required fluid :class="{ 'p-invalid': serverErrors.fechaInicio }" />
+                <InputText v-model="schedule.fechaInicioFormatted" type="datetime-local" required fluid class="w-full" :class="{ 'p-invalid': serverErrors.fechaInicio }" />
                 <small v-if="submitted && !schedule.fechaInicioFormatted" class="text-red-500">La fecha de inicio es obligatoria.</small>
                 <small v-if="serverErrors.fechaInicio" class="text-red-500">{{ serverErrors.fechaInicio[0] }}</small>
             </div>
 
             <!-- Fecha Fin -->
-            <div class="col-span-4">
+            <div class="col-span-12 md:col-span-4">
                 <label class="block font-bold mb-2">Fecha y Hora Fin <span class="text-red-500">*</span></label>
-                <InputText v-model="schedule.fechaFinFormatted" type="datetime-local" required fluid :class="{ 'p-invalid': serverErrors.fechaFin }" />
+                <InputText v-model="schedule.fechaFinFormatted" type="datetime-local" required fluid class="w-full" :class="{ 'p-invalid': serverErrors.fechaFin }" />
                 <small v-if="submitted && !schedule.fechaFinFormatted" class="text-red-500">La fecha de fin es obligatoria.</small>
                 <small v-if="serverErrors.fechaFin" class="text-red-500">{{ serverErrors.fechaFin[0] }}</small>
             </div>
 
             <!-- Espacio -->
-            <div class="col-span-6">
+            <div class="col-span-12 md:col-span-6">
                 <label class="block font-bold mb-2">Espacio <span class="text-red-500">*</span></label>
                 <Dropdown
                     v-model="schedule.idEspacio"
@@ -38,6 +45,7 @@
                     fluid
                     filter
                     filterPlaceholder="Buscar espacio"
+                    class="w-full"
                     :class="{ 'p-invalid': serverErrors.idEspacio }"
                 />
                 <small v-if="submitted && !schedule.idEspacio" class="text-red-500">Debe seleccionar un espacio.</small>
@@ -45,7 +53,7 @@
             </div>
 
             <!-- Empleado -->
-            <div class="col-span-6">
+            <div class="col-span-12 md:col-span-6">
                 <label class="block font-bold mb-2">Empleado <span class="text-red-500">*</span></label>
                 <Dropdown
                     v-model="schedule.idEmpleado"
@@ -56,6 +64,7 @@
                     fluid
                     filter
                     filterPlaceholder="Buscar empleado"
+                    class="w-full"
                     :class="{ 'p-invalid': serverErrors.idEmpleado }"
                 />
                 <small v-if="submitted && !schedule.idEmpleado" class="text-red-500">Debe seleccionar un empleado.</small>
@@ -71,11 +80,16 @@
                 </div>
                 <small v-if="serverErrors.state" class="text-red-500">{{ serverErrors.state[0] }}</small>
             </div>
+
         </div>
     </div>
+
+    <!-- Footer responsive -->
     <template #footer>
-        <Button label="Cancelar" icon="pi pi-times" text @click="dialogVisible = false" />
-        <Button label="Guardar" icon="pi pi-check" @click="updateSchedule" :loading="loading" />
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:justify-end">
+            <Button label="Cancelar" icon="pi pi-times" text class="w-full sm:w-auto" @click="dialogVisible = false" />
+            <Button label="Guardar" icon="pi pi-check" @click="updateSchedule" :loading="loading" class="w-full sm:w-auto" />
+        </div>
     </template>
 </Dialog>
 </template>
