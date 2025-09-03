@@ -94,6 +94,28 @@ La interfaz está construida con **Vue.js** y utiliza **PrimeVue** para componen
 - [PabloLupuX](https://github.com/PabloLupuX)  
 
 ---
+### 📸 Team Pictures
+
+<details>
+  <summary>Landing page</summary>
+  <p align="center">
+    <img src="./public/imagenes/access/ini_ses.jpg" alt="Ini Ses" width="600">
+  </p>
+</details>
+
+<details>
+  <summary>Inicio de sesion</summary>
+  <p align="center">
+    <img src="./public/imagenes/access/landing.jpg" alt="Landing" width="600">
+  </p>
+</details>
+
+<details>
+  <summary>Sistema</summary>
+  <p align="center">
+    <img src="./public/imagenes/access/inicio.jpg" alt="Inicio" width="600">
+  </p>
+</details>
 
 ## 📄 License
 
