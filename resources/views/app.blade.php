@@ -32,8 +32,7 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.cdnfonts.com/css/lato" rel="stylesheet">
+        <link rel="icon" href="{{ asset('imagenes/access/imageC.png') }}" type="image/png">
 
         @routes
         @vite(['resources/js/app.ts'])
