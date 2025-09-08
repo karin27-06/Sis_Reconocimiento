@@ -51,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     #CONSULTA  => BACKEND
     Route::get('/consulta/{dni}', [ConsultasDni::class, 'consultar'])->name('consultar.dni');
     Route::get('/user-id', [ConsultasId::class, 'getUserId'])->middleware('auth:api');
-    Route::post('/verificar-acceso', [VerificarAccesoController::class, 'verificar']);
+    Route::post(uri: '/verificar_acceso', [VerificarAccesoController::class, 'verificar']);
 
     // ESPACIO -> BACKEND
     Route::prefix('espacio')->group(function () {
