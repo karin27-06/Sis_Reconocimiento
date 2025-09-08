@@ -70,7 +70,7 @@ class VerificarAccesoController extends Controller
                         // Buscar horario válido para este empleado en este espacio
                         $fechaActual = Carbon::now();
 
-                        $horario = DB::table('horarios')
+                        $horario = DB::table('schedule_table')
                             ->where('idEmpleado', $empleado->id)
                             ->where('idEspacio', $idEspacio)
                             ->whereDate('fechaInicio', '<=', $fechaActual->toDateString())
