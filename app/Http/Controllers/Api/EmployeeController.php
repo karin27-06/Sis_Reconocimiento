@@ -33,41 +33,33 @@ class EmployeeController extends Controller
         return EmployeeResource::collection($query->paginate($perPage));
     }
 
-public function store(StoreEmployeeRequest $request)
-{
-    Gate::authorize('create', Employee::class);
-    $validated = $request->validated();
+    public function store(StoreEmployeeRequest $request){
+        Gate::authorize('create', Employee::class);
+        $validated = $request->validated();
+        if ($request->hasFile('foto')) {
+            $folder = public_path($this->uploadPath);
 
-    if ($request->hasFile('foto')) {
-        $folder = public_path($this->uploadPath);
+            // Crear carpeta si no existe
+            if (!file_exists($folder)) {
+                mkdir($folder, 0777, true);
+            }
 
-        // Crear carpeta si no existe
-        if (!file_exists($folder)) {
-            mkdir($folder, 0777, true);
+            // Generar nombre único
+            $fileName = uniqid().'_'.$request->file('foto')->getClientOriginalName();
+
+            // Mover archivo
+            $request->file('foto')->move($folder, $fileName);
+
+            // Guardar ruta relativa (para acceder desde frontend)
+            $validated['foto'] = $this->uploadPath . '/' . $fileName;
         }
-
-        // Obtener extensión de la imagen
-        $extension = $request->file('foto')->getClientOriginalExtension();
-
-        // Generar nombre aleatorio: empleado_ + 8 dígitos
-        $fileName = 'empleado_' . mt_rand(10000000, 99999999) . '.' . $extension;
-
-        // Mover archivo a la carpeta de destino
-        $request->file('foto')->move($folder, $fileName);
-
-        // Guardar SOLO el nombre de la foto en la BD
-        $validated['foto'] = $fileName;
+        $employee = Employee::create($validated);
+        return response()->json([
+            'state' => true,
+            'message' => 'Empleado registrado correctamente.',
+            'employee' => new EmployeeResource($employee)
+        ]);
     }
-
-    $employee = Employee::create($validated);
-
-    return response()->json([
-        'state' => true,
-        'message' => 'Empleado registrado correctamente.',
-        'employee' => new EmployeeResource($employee)
-    ]);
-}
-
     public function show(Employee $employee){
         Gate::authorize('view', $employee);
         return response()->json([

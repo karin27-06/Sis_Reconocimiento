@@ -145,6 +145,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export-pdf-employees', [EmployeePDFController::class, 'exportPDF'])->name('export-pdf-employees');
         // Ruta para importar desde Excel
         Route::post('/import-excel-employees', [EmployeeController::class, 'importExcel'])->name('import-excel-employees');
+    
     });
 });
 

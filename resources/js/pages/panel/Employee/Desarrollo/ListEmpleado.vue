@@ -39,14 +39,13 @@
     <Column field="foto" header="Foto" style="min-width: 6rem">
         <template #body="{ data }">
             <img
-    v-if="data.foto"
-    :src="`/uploads/fotos/empleados/${data.foto}`" 
-    alt="Foto"
-    title="Ver foto"
-    class="w-12 h-12 rounded-full object-cover cursor-pointer"
-    @click="verFoto(`/uploads/fotos/empleados/${data.foto}`)"
-/>
-
+                v-if="data.foto"
+                :src="`/${data.foto}`" 
+                alt="Foto"
+                title="Ver foto"
+                class="w-12 h-12 rounded-full object-cover cursor-pointer"
+                @click="verFoto(data.foto)"
+            />
         </template>
     </Column>
     <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 8rem">
