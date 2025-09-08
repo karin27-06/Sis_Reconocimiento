@@ -36,9 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'mustReset' => $user->restablecimiento == 0,
         ]);
     })->name('dashboard');
-Route::get('/test-verificar-acceso', function () {
-    return view('test-verificar-acceso');
-});
+
     #VISTAS DEL FRONTEND
     Route::get('/horarios', [ScheduleWebController::class, 'index'])->name('index.view');
     Route::get('/espacios', [SpaceWebController::class, 'index'])->name('index.view');
