@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\MovementController;
 use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\VerificarAccesoController;
 use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
@@ -50,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     #CONSULTA  => BACKEND
     Route::get('/consulta/{dni}', [ConsultasDni::class, 'consultar'])->name('consultar.dni');
     Route::get('/user-id', [ConsultasId::class, 'getUserId'])->middleware('auth:api');
+Route::post('/Functions/verificar-acceso', [VerificarAccesoController::class, 'verificar']);
 
     // ESPACIO -> BACKEND
     Route::prefix('espacio')->group(function () {
