@@ -58,7 +58,7 @@ class VerificarAccesoController extends Controller
                     $respuesta['acceso'] = 0;
                 } else {
                     // Buscar empleado por huella
-                    $empleado = DB::table('empleado')
+                    $empleado = DB::table('employees')
                         ->where('idHuella', (int) $idHuella)
                         ->first();
 
