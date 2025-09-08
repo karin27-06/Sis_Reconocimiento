@@ -193,6 +193,21 @@ class VerificarAccesoController extends Controller
                 ], 400);
             }
 
+            
+            // ✅ REGISTRAR MOVIMIENTO DESPUÉS DE PROCESAR
+            DB::table('movimientos')->insert([
+                'idEspacio'          => $idEspacio,
+                'idTipo'             => $idTipo,
+                'reconocido'         => $respuesta['reconocido'] ?? 0,
+                'access'             => $respuesta['acceso'] ?? 0,
+                'error'              => $codigoError ?: null,
+                'fechaEnvioESP32'    => $fechaEnvioESP32 ?: null,
+                'fechaRecepcion'     => $fechaRecepcion,
+                'fechaReconocimiento'=> $respuesta['fechaReconocimiento'] ?? null,
+                'created_at'         => Carbon::now(),
+                'updated_at'         => Carbon::now(),
+            ]);
+
         } catch (Exception $e) {
             return response()->json([
                 'error' => '❌ Error interno al procesar la solicitud',
