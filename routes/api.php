@@ -13,8 +13,10 @@ use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Api\VerificarAccesoController;
 
 use App\Models\EmployeeType;
-Route::post('/verificar-acceso', [VerificarAccesoController::class, 'verificar']);
-
+Route::post(uri: '/verificar-acceso', action: [VerificarAccesoController::class, 'verificar']);
+Route::get('/verificar-acceso', function () {
+    return response()->json(['mensaje' => 'Ruta funcionando, usa POST para enviar datos.']);
+});
 Route::middleware('auth')->group(function () {
     Route::apiResource('tipos_empleados', EmployeeType::class);
     Route::apiResource('empleado', EmployeeController::class);
