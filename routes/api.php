@@ -10,7 +10,10 @@ use App\Http\Controllers\Reportes\EmployeePDFController;
 use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
+use App\Http\Controllers\Api\VerificarAccesoController;
+
 use App\Models\EmployeeType;
+Route::post('/verificar-acceso', [VerificarAccesoController::class, 'verificar']);
 
 Route::middleware('auth')->group(function () {
     Route::apiResource('tipos_empleados', EmployeeType::class);
