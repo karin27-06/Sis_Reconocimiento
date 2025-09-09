@@ -194,7 +194,11 @@ onMounted(() => {
                 <Tag :value="data.access ? 'Sí' : 'No'" :severity="getSeverity(data.access)" />
             </template>
         </Column>
-        <Column field="error" header="Error" sortable style="min-width: 6rem" />
+<Column field="error" header="Error" sortable style="min-width: 6rem">
+    <template #body="slotProps">
+        {{ slotProps.data.error && slotProps.data.error != 0 ? slotProps.data.error : 'Ninguno' }}
+    </template>
+</Column>
         <Column field="fechaEnvioESP32" header="Envío ESP32" sortable style="min-width: 13rem" />
         <Column field="fechaRecepcion" header="Recepción" sortable style="min-width: 13rem" />
         <Column field="fechaReconocimiento" header="Reconocimiento" sortable style="min-width: 13rem" />
