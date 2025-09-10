@@ -1,7 +1,7 @@
-<script setup>
-import { Head, Link } from '@inertiajs/vue3';
+<script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
 import Button from 'primevue/button';
-function smoothScroll(id) {
+function smoothScroll(id:string) {
     document.body.click();
     const element = document.getElementById(id);
     if (element) {

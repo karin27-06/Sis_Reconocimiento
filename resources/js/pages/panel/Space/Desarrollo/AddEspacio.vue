@@ -1,15 +1,115 @@
-<template>
-    <Toolbar class="mb-6">
-        <template #start>
-            <Button label="Nuevo espacio" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
-        </template>
-        <template #end>
-            <!-- ToolsSpace para los botones de exportar e importar -->
-            <ToolsSpace />       
-        </template>
-    </Toolbar>
+<script setup lang="ts">
+import { ref } from 'vue';
+import axios, { AxiosError } from 'axios';
+import Dialog from 'primevue/dialog';
+import Toolbar from 'primevue/toolbar';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import Checkbox from 'primevue/checkbox';
+import Tag from 'primevue/tag';
+import { useToast } from 'primevue/usetoast';
+import ToolsSpace from './toolsSpace.vue';
 
-    <Dialog 
+// Interfaces
+interface Espacio {
+    name: string;
+    description: string;
+    state: boolean;
+}
+
+interface ServerErrors {
+    [key: string]: string[];
+}
+
+// Toast
+const toast = useToast();
+
+// Refs
+const submitted = ref<boolean>(false);
+const espacioDialog = ref<boolean>(false);
+const serverErrors = ref<ServerErrors>({});
+const espacio = ref<Espacio>({
+    name: '',
+    description: '',
+    state: true
+});
+
+// Emite evento al padre
+const emit = defineEmits<{
+    (e: 'espacio-agregada'): void
+}>();
+
+// Métodos
+function resetEspacio() {
+    espacio.value = {
+        name: '',
+        description: '',
+        state: true
+    };
+    serverErrors.value = {};
+    submitted.value = false;
+}
+
+function openNew() {
+    resetEspacio();
+    espacioDialog.value = true;
+}
+
+function hideDialog() {
+    espacioDialog.value = false;
+    resetEspacio();
+}
+
+/*async function loadEspacio() {
+    try {
+        const response = await axios.get('/espacio');
+        console.log(response.data);
+        emit('espacio-agregada');
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar los espacios', life: 3000 });
+        console.error(error);
+    }
+}*/
+
+async function guardarEspacio() {
+    submitted.value = true;
+    serverErrors.value = {};
+
+    if (!espacio.value.name) return;
+
+    try {
+        await axios.post('/espacio', espacio.value);
+        toast.add({ severity: 'success', summary: 'Éxito', detail: 'Espacio registrado', life: 3000 });
+        hideDialog();
+        emit('espacio-agregada');
+    } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response && axiosError.response.status === 422) {
+            serverErrors.value = (axiosError.response.data as any).errors || {};
+        } else {
+            toast.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudo registrar el espacio',
+                life: 3000
+            });
+        }
+    }
+}
+</script>
+
+<template>
+<Toolbar class="mb-6">
+    <template #start>
+        <Button label="Nuevo espacio" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
+    </template>
+    <template #end>
+        <ToolsSpace />       
+    </template>
+</Toolbar>
+
+<Dialog 
     v-model:visible="espacioDialog" 
     :style="{ width: '95vw', maxWidth: '600px' }" 
     header="Registro de espacio de trabajo" 
@@ -68,86 +168,3 @@
     </template>
 </Dialog>
 </template>
-
-<script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import Dialog from 'primevue/dialog';
-import Toolbar from 'primevue/toolbar';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
-import Checkbox from 'primevue/checkbox';
-import Tag from 'primevue/tag';
-import { useToast } from 'primevue/usetoast';
-import ToolsSpace from './toolsSpace.vue';
-
-const toast = useToast();
-const submitted = ref(false);
-const espacioDialog = ref(false);
-const serverErrors = ref({});
-const emit = defineEmits(['espacio-agregada']);
-
-const espacio = ref({
-    name: '',
-    description: '',
-    state: true
-});
-// Método para recargar la lista de espacios
-const loadEspacio = async () => {
-    try {
-        const response = await axios.get('/espacio');  // Aquí haces una solicitud GET para obtener los espacios
-        console.log(response.data);
-        // Realiza lo que necesites con la respuesta, como actualizar el listado en un componente superior
-        emit('espacio-agregada');  // Si quieres que un componente padre reciba la notificación de la actualización
-    } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar los espacios', life: 3000 });
-        console.error(error);
-    }
-}
-function resetEspacio() {
-    espacio.value = {
-        name: '',
-        description: '',
-        state: true
-    };
-    serverErrors.value = {};
-    submitted.value = false;
-}
-
-function openNew() {
-    resetEspacio();
-    espacioDialog.value = true;
-}
-
-function hideDialog() {
-    espacioDialog.value = false;
-    resetEspacio();
-}
-
-function guardarEspacio() {
-    submitted.value = true;
-    serverErrors.value = {};
-
-    if (!espacio.value.name) return;
-
-    axios.post('/espacio', espacio.value)
-        .then(() => {
-            toast.add({ severity: 'success', summary: 'Éxito', detail: 'Espacio registrado', life: 3000 });
-            hideDialog();
-            emit('espacio-agregada');
-        })
-        .catch(error => {
-            if (error.response && error.response.status === 422) {
-                serverErrors.value = error.response.data.errors || {};
-            } else {
-                toast.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'No se pudo registrar el espacio',
-                    life: 3000
-                });
-            }
-        });
-}
-</script>

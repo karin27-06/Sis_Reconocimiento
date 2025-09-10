@@ -32,20 +32,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+//import { ref } from 'vue'
 import  Button  from 'primevue/button'
 //import { FileBarChart, FileDown, FileUp } from 'lucide-vue-next'
-import axios from 'axios'
-import { useToast } from 'primevue/usetoast'
+//import axios from 'axios'
+//import { useToast } from 'primevue/usetoast'
 
-const fileRef = ref<HTMLInputElement | null>(null)
-const  toast  = useToast()
+//const fileRef = ref<HTMLInputElement | null>(null)
+//const  toast  = useToast()
 
-const emit = defineEmits<{
+/*const emit = defineEmits<{
     (e: 'import-success'): void
-}>()
+}>()*/
 
-const handleImportClick = () => {
+/*const handleImportClick = () => {
     fileRef.value?.click()
 }
 
@@ -69,5 +69,5 @@ const handleFileChange = async (event: Event) => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Hubo un error al importar el archivo.' })
         console.error(error)
     }
-}
+}*/
 </script>

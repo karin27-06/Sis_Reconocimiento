@@ -1,13 +1,36 @@
-<script setup>
+<script lang="ts" setup>
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppMenuItem from './AppMenuItem.vue';
 
-const page = usePage();
-const permissions = computed(() => page.props.auth.user?.permissions ?? []);
-const hasPermission = (perm) => permissions.value.includes(perm);
+// Tipos para usuario y permisos
+interface User {
+    permissions?: string[];
+}
 
-const model = computed(() => [
+interface Auth {
+    user?: User;
+}
+
+// Obtenemos los props de la página
+const page = usePage<{ auth: Auth }>();
+
+// Computed para permisos del usuario
+const permissions = computed<string[]>(() => page.props.auth.user?.permissions ?? []);
+
+// Función para verificar permisos
+const hasPermission = (perm: string): boolean => permissions.value.includes(perm);
+
+// Tipos del menú
+interface MenuItem {
+    label: string;
+    icon?: string;
+    to?: string;
+    items?: MenuItem[];
+}
+
+// Computed para el modelo del menú
+const model = computed<MenuItem[]>(() => [
     {
         label: 'Home',
         items: [
@@ -20,24 +43,24 @@ const model = computed(() => [
             hasPermission('ver espacios') && { label: 'Espacios', icon: 'pi pi-fw pi-briefcase', to: '/espacios' },
             hasPermission('ver horarios') && { label: 'Horarios', icon: 'pi pi-fw pi-clock', to: '/horarios' },
             hasPermission('ver movimientos') && { label: 'Movimientos', icon: 'pi pi-fw pi-arrow-right-arrow-left', to: '/movimientos' },
-        ].filter(Boolean),
+        ].filter(Boolean) as MenuItem[],
     },
     {
-  label: 'Usuarios y Seguridad',
-  items: [
-    hasPermission('ver usuarios') && { label: 'Gestión de Usuarios', icon: 'pi pi-fw pi-user-edit', to: '/usuario' },
-    hasPermission('ver roles') && { label: 'Roles', icon: 'pi pi-fw pi-shield', to: '/roles' },
-    (hasPermission('ver empleados') || hasPermission('ver tipos_empleados')) && {
-      label: 'Empleado',
-      icon: 'pi pi-fw pi-id-card',
-      items: [
-        hasPermission('ver empleados') && { label: 'Empleados', icon: 'pi pi-fw pi-id-card', to: '/empleados' },
-        hasPermission('ver tipos_empleados') && { label: 'Tipo de empleados', icon: 'pi pi-fw pi-sitemap', to: '/tipo_empleados' },
-      ].filter(Boolean),
+        label: 'Usuarios y Seguridad',
+        items: [
+            hasPermission('ver usuarios') && { label: 'Gestión de Usuarios', icon: 'pi pi-fw pi-user-edit', to: '/usuario' },
+            hasPermission('ver roles') && { label: 'Roles', icon: 'pi pi-fw pi-shield', to: '/roles' },
+            (hasPermission('ver empleados') || hasPermission('ver tipos_empleados')) && {
+                label: 'Empleado',
+                icon: 'pi pi-fw pi-id-card',
+                items: [
+                    hasPermission('ver empleados') && { label: 'Empleados', icon: 'pi pi-fw pi-id-card', to: '/empleados' },
+                    hasPermission('ver tipos_empleados') && { label: 'Tipo de empleados', icon: 'pi pi-fw pi-sitemap', to: '/tipo_empleados' },
+                ].filter(Boolean) as MenuItem[],
+            },
+        ].filter(Boolean) as MenuItem[],
     },
-  ].filter(Boolean),
-},
-].filter(section => section.items.length > 0));
+].filter(section => section.items && section.items.length > 0) as MenuItem[]);
 </script>
 
 <template>

@@ -1,14 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import AppLayout from '@/layout/AppLayout.vue';
 import { Head, usePage } from '@inertiajs/vue3';
-import axios from 'axios';
-import Calendar from 'primevue/calendar';
-import Chart from 'primevue/chart';
-import Button from 'primevue/button';
-import Column from 'primevue/column';
 import Message from 'primevue/message';
-import DataTable from 'primevue/datatable';
-import { onMounted, ref, watch } from 'vue';
 import Password from './settings/Password.vue';
 const page = usePage();
 const mustReset = page.props.mustReset;

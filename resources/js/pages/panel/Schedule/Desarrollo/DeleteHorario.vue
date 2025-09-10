@@ -1,28 +1,53 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import { useToast } from 'primevue/usetoast';
 
-const props = defineProps({
-    visible: Boolean,
-    schedule: Object, // recibimos el schedule
-});
-const emit = defineEmits(['update:visible', 'deleted']);
+// Interfaces
+interface Schedule {
+    id: number;
+    fecha?: string;
+    fechaInicio?: string;
+    fechaFin?: string;
+    idEspacio?: number;
+    idEmpleado?: number;
+    state?: boolean;
+}
 
+// Props
+const props = defineProps<{
+    visible: boolean;
+    schedule: Schedule | null;
+}>();
+
+// Emit
+const emit = defineEmits<{
+    (e: 'update:visible', value: boolean): void;
+    (e: 'deleted'): void;
+}>();
+
+// Toast
 const toast = useToast();
-const localVisible = ref(false);
 
+// Estado local
+const localVisible = ref<boolean>(props.visible);
+
+// Sincronizar props.visible con localVisible
 watch(() => props.visible, (newVal) => {
     localVisible.value = newVal;
 });
 
+// Función para cerrar dialog
 function closeDialog() {
     emit('update:visible', false);
 }
 
+// Función para eliminar horario
 async function deleteSchedule() {
+    if (!props.schedule) return;
+
     try {
         await axios.delete(`/horario/${props.schedule.id}`);
         emit('deleted');
@@ -36,8 +61,9 @@ async function deleteSchedule() {
     } catch (error) {
         console.error(error);
         let errorMessage = 'Error eliminando el horario';
-        if (error.response) {
-            errorMessage = error.response.data.message || errorMessage;
+        const err = error as AxiosError<{ message?: string }>;
+        if (err.response?.data?.message) {
+            errorMessage = err.response.data.message;
         }
         toast.add({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
     }
@@ -45,12 +71,17 @@ async function deleteSchedule() {
 </script>
 
 <template>
-    <Dialog v-model:visible="localVisible" :style="{ width: '90%', maxWidth: '450px' }" header="Confirmar" :modal="true"
-        @update:visible="closeDialog">
+    <Dialog 
+        v-model:visible="localVisible" 
+        :style="{ width: '90%', maxWidth: '450px' }" 
+        header="Confirmar" 
+        :modal="true"
+        @update:visible="closeDialog"
+    >
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="schedule">
-                ¿Estás seguro de eliminar el horario del día con codigo de horario <b>{{ schedule.id }}</b>?
+            <span v-if="props.schedule">
+                ¿Estás seguro de eliminar el horario del día con código de horario <b>{{ props.schedule.id }}</b>?
             </span>
         </div>
         <template #footer>

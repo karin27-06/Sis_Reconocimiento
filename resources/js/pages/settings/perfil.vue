@@ -47,13 +47,13 @@ import { useForm, usePage, Link } from '@inertiajs/vue3'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
-import { Transition } from 'vue'
+//import { Transition } from 'vue'
 import DeleteUser from './DeleteUser.vue'
 
 // Props recibidas desde Profile.vue
 interface Props {
     mustVerifyEmail: boolean;
-    status?: string;
+    status?: string | null;
 }
 const props = defineProps<Props>();
 const mustVerifyEmail = props.mustVerifyEmail;

@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\MovementController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SpaceController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Web\EmployeeTypeWebController;
@@ -147,7 +148,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/import-excel-employees', [EmployeeController::class, 'importExcel'])->name('import-excel-employees');
     });
 });
+            //RUTAS PARA QUE PASEN EL TEST
+        Route::get('/register', [RegisteredUserController::class, 'create'])
+            ->middleware('guest')
+            ->name('register');
 
+        Route::post('/register', [RegisteredUserController::class, 'store'])
+            ->middleware('guest');
 // Archivos de configuración adicionales
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

@@ -1,22 +1,50 @@
-<script setup>
-import { useLayout } from '@/layout/composables/layout';
-import { onBeforeMount, ref, watch, computed } from 'vue';
+<script setup lang="ts">
+import { ref, onBeforeMount, watch, computed } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
+import { useLayout } from '@/layout/composables/layout';
 
-const page = usePage();
-const { layoutState, setActiveMenuItem, toggleMenu } = useLayout();
+// Interfaces
+interface MenuItem {
+  label: string;
+  icon?: string;
+  to?: string;
+  url?: string;
+  target?: string;
+  class?: string;
+  items?: MenuItem[];
+  command?: (event: { originalEvent: Event; item: MenuItem }) => void;
+  requiresAuth?: boolean;
+  guestOnly?: boolean;
+  permissions?: string[];
+  roles?: string[];
+  visible?: boolean;
+  only?: any[];
+  preserveState?: boolean;
+  preserveScroll?: boolean;
+  disabled?: boolean;
+}
 
-const isAuthenticated = computed(() => {
-  return page.props.auth && page.props.auth.user;
-});
+interface AuthUser {
+  id: number;
+  name: string;
+  permissions?: string[];
+  roles?: string[];
+  [key: string]: any;
+}
 
-const authUser = computed(() => {
-  return isAuthenticated.value ? page.props.auth.user : null;
-});
+interface Auth {
+  user?: AuthUser | null;
+}
 
+interface PageProps {
+  auth?: Auth | null;
+  [key: string]: any;
+}
+
+// Props
 const props = defineProps({
   item: {
-    type: Object,
+    type: Object as () => MenuItem,
     default: () => ({})
   },
   index: {
@@ -33,23 +61,38 @@ const props = defineProps({
   }
 });
 
-const isActiveMenu = ref(false);
-const itemKey = ref(null);
+// Layout y página
+const page = usePage<PageProps>();
+const { layoutState, setActiveMenuItem, toggleMenu } = useLayout();
 
-onBeforeMount(() => {
-  itemKey.value = props.parentItemKey ? props.parentItemKey + '-' + props.index : String(props.index);
-  const activeItem = layoutState.activeMenuItem;
-  isActiveMenu.value = activeItem === itemKey.value || activeItem ? activeItem.startsWith(itemKey.value + '-') : false;
+// Computed
+const isAuthenticated = computed(() => !!(page.props.auth?.user));
+const authUser = computed<AuthUser | null>(() => {
+  return isAuthenticated.value && page.props.auth?.user ? page.props.auth.user : null;
 });
 
+// Refs
+const isActiveMenu = ref(false);
+const itemKey = ref<string | undefined>(undefined);
+
+// Antes de montar
+onBeforeMount(() => {
+  itemKey.value = props.parentItemKey ? `${props.parentItemKey}-${props.index}` : String(props.index);
+  const activeItem = layoutState.activeMenuItem as string | null;
+  isActiveMenu.value = activeItem === itemKey.value || (!!activeItem && activeItem.startsWith(itemKey.value + '-'));
+});
+
+// Watcher de cambio de menú activo
 watch(
   () => layoutState.activeMenuItem,
   (newVal) => {
-    isActiveMenu.value = newVal === itemKey.value || newVal.startsWith(itemKey.value + '-');
+    const active = newVal as string | null;
+    isActiveMenu.value = active === itemKey.value || (!!active && active.startsWith(itemKey.value + '-'));
   }
 );
 
-function itemClick(event, item) {
+// Funciones
+function itemClick(event: Event, item: MenuItem) {
   if (item.requiresAuth && !isAuthenticated.value) {
     event.preventDefault();
     window.location.href = route('login');
@@ -58,7 +101,7 @@ function itemClick(event, item) {
 
   if (item.permissions && authUser.value) {
     const hasPermission = item.permissions.some(permission =>
-      authUser.value.permissions && authUser.value.permissions.includes(permission)
+      authUser.value?.permissions?.includes(permission) ?? false
     );
 
     if (!hasPermission) {
@@ -77,50 +120,33 @@ function itemClick(event, item) {
   }
 
   if (item.command) {
-    item.command({ originalEvent: event, item: item });
+    item.command({ originalEvent: event, item });
   }
 
-  const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
-  setActiveMenuItem(foundItemKey);
+  const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey.value) : itemKey.value;
+  if (foundItemKey) setActiveMenuItem(foundItemKey);
 }
 
-function checkActiveRoute(item) {
-  // Comprobar si la ruta actual coincide con la ruta del elemento
+function checkActiveRoute(item: MenuItem) {
   return page.url === item.to;
 }
 
-// Verificar si el elemento debe mostrarse basado en la autenticación y permisos
-function shouldShowItem(item) {
-  // Si el elemento tiene requiresAuth y el usuario no está autenticado, no mostrar
-  if (item.requiresAuth && !isAuthenticated.value) {
-    return false;
-  }
+function shouldShowItem(item: MenuItem) {
+  if (item.requiresAuth && !isAuthenticated.value) return false;
+  if (item.guestOnly && isAuthenticated.value) return false;
 
-  // Si el elemento tiene guestOnly y el usuario está autenticado, no mostrar
-  if (item.guestOnly && isAuthenticated.value) {
-    return false;
-  }
-
-  // Verificar permisos si es necesario
   if (item.permissions && authUser.value) {
     const hasPermission = item.permissions.some(permission =>
-      authUser.value.permissions && authUser.value.permissions.includes(permission)
+      authUser.value?.permissions?.includes(permission)
     );
-
-    if (!hasPermission) {
-      return false;
-    }
+    if (!hasPermission) return false;
   }
 
-  // Verificar roles si es necesario
   if (item.roles && authUser.value) {
     const hasRole = item.roles.some(role =>
-      authUser.value.roles && authUser.value.roles.includes(role)
+      authUser.value?.roles?.includes(role)
     );
-
-    if (!hasRole) {
-      return false;
-    }
+    if (!hasRole) return false;
   }
 
   return item.visible !== false;
@@ -129,22 +155,23 @@ function shouldShowItem(item) {
 
 <template>
   <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
+    <!-- Label raíz -->
     <div v-if="root && shouldShowItem(item)" class="layout-menuitem-root-text">{{ item.label }}</div>
 
-    <!-- Para enlaces externos o elementos con submenús -->
-    <a v-if="(!item.to || item.items) && shouldShowItem(item)" :href="item.url" @click="itemClick($event, item, index)"
+    <!-- Enlace externo o con submenú -->
+    <a v-if="(!item.to || item.items) && shouldShowItem(item)" :href="item.url" @click="itemClick($event, item)"
       :class="item.class" :target="item.target" tabindex="0">
       <i :class="item.icon" class="layout-menuitem-icon"></i>
       <span class="layout-menuitem-text">{{ item.label }}</span>
       <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
     </a>
 
-    <!-- Para rutas internas usando Inertia Link -->
-    <Link v-if="item.to && !item.items && shouldShowItem(item)" :href="item.to" @click="itemClick($event, item, index)"
+    <!-- Rutas internas (Inertia Link) -->
+    <Link v-if="item.to && !item.items && shouldShowItem(item)" :href="item.to" @click="itemClick($event, item)"
       :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :only="item.only || []"
       :preserve-state="item.preserveState || false" :preserve-scroll="item.preserveScroll || false">
-    <i :class="item.icon" class="layout-menuitem-icon"></i>
-    <span class="layout-menuitem-text">{{ item.label }}</span>
+      <i :class="item.icon" class="layout-menuitem-icon"></i>
+      <span class="layout-menuitem-text">{{ item.label }}</span>
     </Link>
 
     <!-- Submenú recursivo -->

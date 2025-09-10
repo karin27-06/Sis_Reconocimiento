@@ -16,12 +16,18 @@
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
                 <div class="sm:col-span-9">
                     <label for="dni" class="block font-bold mb-3">DNI <span class="text-red-500">*</span></label>
-                    <InputText id="dni" v-model.trim="usuario.dni" required autofocus fluid
-                        :invalid="(submitted && !usuario.dni) || serverErrors.dni" maxlength="8"
-                        @keydown.enter="consultarusuarioPorDNI" />
+                    <InputText 
+                        id="dni" 
+                        v-model.trim="usuario.dni" 
+                        required 
+                        autofocus 
+                        fluid
+                        :class="{ 'p-invalid': (submitted && !usuario.dni) || serverErrors.dni }" 
+                        maxlength="8"
+                        @keydown.enter="consultarusuarioPorDNI" 
+                    />
                     <small v-if="submitted && !usuario.dni" class="text-red-500">El DNI es obligatorio.</small>
-                    <small v-else-if="submitted && usuario.dni.length !== 8" class="text-red-500">El DNI debe tener 8
-                        dígitos.</small>
+                    <small v-else-if="submitted && usuario.dni.length !== 8" class="text-red-500">El DNI debe tener 8 dígitos.</small>
                     <small v-else-if="serverErrors.dni" class="text-red-500">{{ serverErrors.dni[0] }}</small>
                 </div>
                 <div class="sm:col-span-3 flex flex-col">
@@ -166,9 +172,9 @@
     </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
@@ -176,21 +182,50 @@ import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Tag from 'primevue/tag';
 import Password from 'primevue/password';
+import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
 import { defineEmits } from 'vue';
-//import Select from 'primevue/select';
-import Dropdown from 'primevue/dropdown';  // Importamos Dropdown
+
+interface Rol {
+    id: number;
+    name: string;
+}
+
+interface Usuario {
+    dni: string;
+    name: string;
+    apellidos: string;
+    nacimiento: string;
+    email: string;
+    username: string;
+    password: string;
+    status: boolean;
+    role_id: number | null;
+}
+
+interface ServerErrors {
+    dni?: string[];
+    name?: string[];
+    apellidos?: string[];
+    nacimiento?: string[];
+    email?: string[];
+    password?: string[];
+    status?: string[];
+    role_id?: string[];
+}
 
 const toast = useToast();
-const roles = ref([]);
+const roles = ref<Rol[]>([]);
 const submitted = ref(false);
 const usuarioDialog = ref(false);
-const serverErrors = ref({});
-const emit = defineEmits(['usuario-agregado']);
+const serverErrors = ref<ServerErrors>({});
+const emit = defineEmits<{
+    (e: 'usuario-agregado'): void;
+}>();
 const editableNacimiento = ref(false);
 const editableUsername = ref(false);
 
-const usuarioReseteo = {
+const usuarioReseteo: Usuario = {
     dni: '',
     name: '',
     apellidos: '',
@@ -202,20 +237,9 @@ const usuarioReseteo = {
     role_id: null,
 };
 
-const usuario = ref({
-    dni: '',
-    name: '',
-    apellidos: '',
-    nacimiento: '',
-    email: '',
-    username: '',
-    password: '',
-    status: true,
-    role_id: null,
-    usuarioReseteo
-});
+const usuario = ref<Usuario>({ ...usuarioReseteo });
 
-function openNew() {
+function openNew(): void {
     submitted.value = false;
     usuarioDialog.value = true;
     usuario.value = { ...usuarioReseteo };
@@ -223,7 +247,7 @@ function openNew() {
     editableUsername.value = false;
 }
 
-function hideDialog() {
+function hideDialog(): void {
     usuarioDialog.value = false;
     submitted.value = false;
     usuario.value = { ...usuarioReseteo };
@@ -231,23 +255,20 @@ function hideDialog() {
     editableUsername.value = false;
 }
 
-function consultarusuarioPorDNI() {
+function consultarusuarioPorDNI(): void {
     const dni = usuario.value.dni;
     if (dni && dni.length === 8) {
         axios.get(`/consulta/${dni}`)
             .then(response => {
                 const data = response.data;
                 if (data.success && data.data) {
-                    const name = data.data.nombres || '';
-                    const apellido_paterno = data.data.apellido_paterno || '';
-                    const apellido_materno = data.data.apellido_materno || '';
-                    const nacimiento = data.data.fecha_nacimiento || '';
+                    const { nombres = '', apellido_paterno = '', apellido_materno = '', fecha_nacimiento = '' } = data.data;
 
-                    usuario.value.name = name;
+                    usuario.value.name = nombres;
                     usuario.value.apellidos = `${apellido_paterno} ${apellido_materno}`.trim();
-                    usuario.value.nacimiento = nacimiento;
+                    usuario.value.nacimiento = fecha_nacimiento;
 
-                    usuario.value.username = generarUsername(name, apellido_paterno, apellido_materno, nacimiento);
+                    usuario.value.username = generarUsername(nombres, apellido_paterno, apellido_materno, fecha_nacimiento);
                 } else {
                     toast.add({ severity: 'warn', summary: 'No encontrado', detail: 'No se encontraron datos para este DNI', life: 3000 });
                 }
@@ -258,8 +279,8 @@ function consultarusuarioPorDNI() {
     }
 }
 
-function generarUsername(nombre, apellidoPaterno, apellidoMaterno, nacimiento) {
-    const normalizar = (texto) => {
+function generarUsername(nombre: string, apellidoPaterno: string, apellidoMaterno: string, nacimiento: string): string {
+    const normalizar = (texto: string) => {
         return texto
             ?.replace(/ñ/g, 'n')
             .replace(/Ñ/g, 'n')
@@ -276,26 +297,28 @@ function generarUsername(nombre, apellidoPaterno, apellidoMaterno, nacimiento) {
     return `${primeraLetraNombre}${primerApellido}${segundoApellido}${diaNacimiento}`.toUpperCase();
 }
 
-function guardarUsuario() {
+function guardarUsuario(): void {
     submitted.value = true;
     serverErrors.value = {};
 
     axios.post('/usuarios', usuario.value)
-        .then(response => {
+        .then(() => {
             toast.add({ severity: 'success', summary: 'Éxito', detail: 'Usuario registrado', life: 3000 });
             hideDialog();
             emit('usuario-agregado');
         })
-        .catch(error => {
+        .catch((error: AxiosError) => {
             if (error.response && error.response.status === 422) {
-                const errors = error.response.data.errors;
+                const errors = (error.response.data as any).errors;
                 serverErrors.value = {
                     dni: errors.dni,
-                    nombre: errors.name,
+                    name: errors.name,
                     apellidos: errors.apellidos,
                     nacimiento: errors.nacimiento,
-                    correo: errors.email,
+                    email: errors.email,
                     password: errors.password,
+                    status: errors.status,
+                    role_id: errors.role_id
                 };
             }
         });

@@ -1,12 +1,14 @@
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue'
+import Button from 'primevue/button'
+import Menu from 'primevue/menu'
 
-const menu = ref(null);
+const menu = ref<InstanceType<typeof Menu> | null>(null)
 
-const items = ref([
-    { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-    { label: 'Remove', icon: 'pi pi-fw pi-trash' }
-]);
+const items = [
+  { label: 'Add New', icon: 'pi pi-fw pi-plus' },
+  { label: 'Remove', icon: 'pi pi-fw pi-trash' }
+]
 </script>
 
 <template>
@@ -14,8 +16,8 @@ const items = ref([
         <div class="flex justify-between items-center mb-6">
             <div class="font-semibold text-xl">Best Selling Products</div>
             <div>
-                <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu.toggle($event)"></Button>
-                <Menu ref="menu" popup :model="items" class="!min-w-40"></Menu>
+                <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="menu?.toggle($event)"/>
+                <Menu ref="menu" popup :model="items" class="!min-w-40" />
             </div>
         </div>
         <ul class="list-none p-0 m-0">
