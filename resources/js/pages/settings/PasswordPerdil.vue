@@ -5,7 +5,7 @@ import { useForm } from '@inertiajs/vue3';
 // PrimeVue components
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import Message from 'primevue/message';
+//import Message from 'primevue/message';
 
 const currentPasswordInput = ref<HTMLInputElement | null>(null);
 const passwordInput = ref<HTMLInputElement | null>(null);

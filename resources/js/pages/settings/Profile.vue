@@ -1,6 +1,5 @@
 <template>
     <AppLayout>
-
         <Head title="Perfil" />
         <div class="card">
             <template v-if="isLoading">
@@ -44,7 +43,8 @@
         </div>
     </AppLayout>
 </template>
-<script setup>
+
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layout/AppLayout.vue';
@@ -57,12 +57,14 @@ import TabPanel from 'primevue/tabpanel';
 import PasswordPerdil from './PasswordPerdil.vue';
 import perfil from './perfil.vue';
 
-const isLoading = ref(true);
-const page = usePage();
+const isLoading = ref<boolean>(true);
 
-// Obtener las propiedades necesarias para el componente perfil
-const mustVerifyEmail = page.props.mustVerifyEmail || false;
-const status = page.props.status || null;
+// Obtener datos de la página
+const page = usePage<any>();
+
+// Propiedades para el componente perfil
+const mustVerifyEmail: boolean = page.props.mustVerifyEmail ?? false;
+const status: string | null = page.props.status ?? null;
 
 onMounted(() => {
     setTimeout(() => {
@@ -70,4 +72,5 @@ onMounted(() => {
     }, 1000);
 });
 </script>
+
 <style scoped></style>
