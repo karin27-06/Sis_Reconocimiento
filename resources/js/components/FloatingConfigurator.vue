@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
 import Button from 'primevue/button';
