@@ -30,7 +30,10 @@
                 <!-- Tipo -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Tipo <span class="text-red-500">*</span></label>
-                    <InputText v-model.trim="movimiento.idTipo" placeholder="Ingrese tipo de movimiento" class="w-full"
+                    <InputText 
+                        v-model.trim="movimiento.idTipo" 
+                        placeholder="Ingrese tipo de movimiento" 
+                        class="w-full"
                         :class="{ 'p-invalid': serverErrors.idTipo }"
                     />
                     <small v-if="submitted && !movimiento.idTipo" class="text-red-500">El tipo es obligatorio.</small>
@@ -52,7 +55,11 @@
                 <!-- Error -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Error</label>
-                    <InputText v-model.trim="movimiento.error" maxlength="3" placeholder="Ingrese código de error" class="w-full"
+                    <InputText 
+                        v-model.trim="movimiento.error" 
+                        maxlength="3" 
+                        placeholder="Ingrese código de error" 
+                        class="w-full"
                         :class="{ 'p-invalid': serverErrors.error }"
                     />
                     <small v-if="serverErrors.error" class="text-red-500">{{ serverErrors.error[0] }}</small>
@@ -61,7 +68,10 @@
                 <!-- Fechas -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Fecha Envío ESP32</label>
-                    <InputText type="datetime-local" v-model="movimiento.fechaEnvioESP32" class="w-full"
+                    <InputText 
+                        type="datetime-local" 
+                        v-model="movimiento.fechaEnvioESP32" 
+                        class="w-full"
                         :class="{ 'p-invalid': serverErrors.fechaEnvioESP32 }"
                     />
                     <small v-if="serverErrors.fechaEnvioESP32" class="text-red-500">{{ serverErrors.fechaEnvioESP32[0] }}</small>
@@ -69,7 +79,10 @@
 
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Fecha Recepción</label>
-                    <InputText type="datetime-local" v-model="movimiento.fechaRecepcion" class="w-full"
+                    <InputText 
+                        type="datetime-local" 
+                        v-model="movimiento.fechaRecepcion" 
+                        class="w-full"
                         :class="{ 'p-invalid': serverErrors.fechaRecepcion }"
                     />
                     <small v-if="serverErrors.fechaRecepcion" class="text-red-500">{{ serverErrors.fechaRecepcion[0] }}</small>
@@ -77,7 +90,10 @@
 
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Fecha Reconocimiento</label>
-                    <InputText type="datetime-local" v-model="movimiento.fechaReconocimiento" class="w-full"
+                    <InputText 
+                        type="datetime-local" 
+                        v-model="movimiento.fechaReconocimiento" 
+                        class="w-full"
                         :class="{ 'p-invalid': serverErrors.fechaReconocimiento }"
                     />
                     <small v-if="serverErrors.fechaReconocimiento" class="text-red-500">{{ serverErrors.fechaReconocimiento[0] }}</small>
@@ -93,9 +109,9 @@
     </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
@@ -103,36 +119,46 @@ import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
 
-const props = defineProps({
-    visible: Boolean,
-    movimientoId: Number
-});
+// Tipos
+interface Movimiento {
+    idEspacio: number | null;
+    idTipo: string;
+    reconocido: boolean;
+    access: boolean;
+    error: string;
+    fechaEnvioESP32: string;
+    fechaRecepcion: string;
+    fechaReconocimiento: string;
+}
 
-const toast = useToast();
-const dialogVisible = ref(props.visible);
-const loading = ref(false);
-const submitted = ref(false);
-const serverErrors = ref({});
-const espacios = ref([]);
+interface Espacio {
+    id: number;
+    name: string;
+}
 
+interface ServerErrors {
+    [key: string]: string[];
+}
 
-const emit = defineEmits(['update:visible', 'updated']);
+// Props
+const props = defineProps<{
+    visible: boolean;
+    movimientoId: number | null;
+}>();
 
-const formatDateToInput = (dateString) => {
-    if (!dateString) return '';
-    // Separar fecha y hora
-    const [datePart, timePart, meridiem] = dateString.split(' '); // "30-08-2025", "12:22:00", "PM"
-    const [dd, mm, yyyy] = datePart.split('-');
-    let [hh, min] = timePart.split(':');
+// Emit
+const emit = defineEmits<{
+    (e: 'update:visible', value: boolean): void;
+    (e: 'updated'): void;
+}>();
 
-    hh = parseInt(hh, 10);
-    if (meridiem === 'PM' && hh < 12) hh += 12;
-    if (meridiem === 'AM' && hh === 12) hh = 0;
-
-    return `${yyyy}-${mm}-${dd}T${hh.toString().padStart(2,'0')}:${min}`;
-};
-
-const movimiento = ref({
+// Ref
+const dialogVisible = ref<boolean>(props.visible);
+const loading = ref<boolean>(false);
+const submitted = ref<boolean>(false);
+const serverErrors = ref<ServerErrors>({});
+const espacios = ref<Espacio[]>([]);
+const movimiento = ref<Movimiento>({
     idEspacio: null,
     idTipo: '',
     reconocido: false,
@@ -143,6 +169,10 @@ const movimiento = ref({
     fechaReconocimiento: ''
 });
 
+// Toast
+const toast = useToast();
+
+// Watchers
 watch(() => props.visible, (val) => {
     dialogVisible.value = val;
     if (val && props.movimientoId) {
@@ -152,19 +182,28 @@ watch(() => props.visible, (val) => {
 });
 watch(dialogVisible, (val) => emit('update:visible', val));
 
-// Cargar datos del movimiento
-const fetchMovimiento = async () => {
+// Funciones
+const formatDateToInput = (dateString: string | null | undefined): string => {
+    if (!dateString) return '';
+    const [datePart, timePart, meridiem] = dateString.split(' ');
+    const [dd, mm, yyyy] = datePart.split('-');
+    let [hh, min] = timePart.split(':');
+    let hour = parseInt(hh, 10);
+    if (meridiem === 'PM' && hour < 12) hour += 12;
+    if (meridiem === 'AM' && hour === 12) hour = 0;
+    return `${yyyy}-${mm}-${dd}T${hour.toString().padStart(2, '0')}:${min}`;
+};
+
+// Cargar movimiento
+const fetchMovimiento = async (): Promise<void> => {
     try {
         loading.value = true;
         const res = await axios.get(`/movimiento/${props.movimientoId}`);
-        
         if (!res.data || !res.data.movement) {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Movimiento no encontrado', life: 3000 });
             return;
         }
-
         const data = res.data.movement;
-
         movimiento.value = {
             idEspacio: data.idEspacio ?? null,
             idTipo: data.idTipo ?? '',
@@ -183,9 +222,8 @@ const fetchMovimiento = async () => {
     }
 };
 
-
 // Cargar espacios
-const fetchEspacios = async () => {
+const fetchEspacios = async (): Promise<void> => {
     try {
         const res = await axios.get('/espacio', { params: { state: 1 } });
         espacios.value = res.data.data;
@@ -196,7 +234,7 @@ const fetchEspacios = async () => {
 };
 
 // Actualizar movimiento
-const updateMovimiento = async () => {
+const updateMovimiento = async (): Promise<void> => {
     submitted.value = true;
     serverErrors.value = {};
     if (!movimiento.value.idEspacio || !movimiento.value.idTipo) return;
@@ -208,8 +246,9 @@ const updateMovimiento = async () => {
         dialogVisible.value = false;
         emit('updated');
     } catch (error) {
-        if (error.response && error.response.data?.errors) {
-            serverErrors.value = error.response.data.errors;
+        const err = error as AxiosError<{ errors?: ServerErrors }>;
+        if (err.response?.data?.errors) {
+            serverErrors.value = err.response.data.errors;
             toast.add({ severity: 'error', summary: 'Error de validación', detail: 'Revisa los campos e intenta nuevamente', life: 5000 });
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el movimiento', life: 3000 });
@@ -219,5 +258,4 @@ const updateMovimiento = async () => {
         loading.value = false;
     }
 };
-
 </script>

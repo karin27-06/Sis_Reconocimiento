@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
@@ -6,27 +6,49 @@ import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Checkbox from 'primevue/checkbox';
 import Tag from 'primevue/tag';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useToast } from 'primevue/usetoast';
 
-const props = defineProps({
-    visible: Boolean,
-    espacioId: Number
-});
-const emit = defineEmits(['update:visible', 'updated']);
+// Interfaces
+interface Espacio {
+    name: string;
+    description: string;
+    state: boolean;
+}
 
+interface ServerErrors {
+    name?: string[];
+    description?: string[];
+    state?: string[];
+}
+
+// Props
+const props = defineProps<{
+    visible: boolean;
+    espacioId: number | null;
+}>();
+
+// Emit
+const emit = defineEmits<{
+    (e: 'update:visible', value: boolean): void;
+    (e: 'updated'): void;
+}>();
+
+// Toast
 const toast = useToast();
-const dialogVisible = ref(props.visible);
-const loading = ref(false);
-const submitted = ref(false);
-const serverErrors = ref({});
 
-const espacio = ref({
+// Refs
+const dialogVisible = ref<boolean>(props.visible);
+const loading = ref<boolean>(false);
+const submitted = ref<boolean>(false);
+const serverErrors = ref<ServerErrors>({});
+const espacio = ref<Espacio>({
     name: '',
     description: '',
     state: false,
 });
 
+// Watchers
 watch(() => props.visible, (val) => {
     dialogVisible.value = val;
     if (val && props.espacioId) {
@@ -35,6 +57,7 @@ watch(() => props.visible, (val) => {
 });
 watch(dialogVisible, (val) => emit('update:visible', val));
 
+// Fetch espacio
 const fetchEspacio = async () => {
     try {
         loading.value = true;
@@ -53,6 +76,7 @@ const fetchEspacio = async () => {
     }
 };
 
+// Update espacio
 const updateEspacio = async () => {
     submitted.value = true;
     serverErrors.value = {};
@@ -76,8 +100,9 @@ const updateEspacio = async () => {
         dialogVisible.value = false;
         emit('updated');
     } catch (error) {
-        if (error.response && error.response.data?.errors) {
-            serverErrors.value = error.response.data.errors;
+        const axiosError = error as AxiosError<any>;
+        if (axiosError.response && axiosError.response.data?.errors) {
+            serverErrors.value = axiosError.response.data.errors;
             toast.add({
                 severity: 'error',
                 summary: 'Error de validación',
@@ -98,7 +123,7 @@ const updateEspacio = async () => {
 </script>
 
 <template>
-    <Dialog 
+<Dialog 
     v-model:visible="dialogVisible" 
     header="Editar espacio de trabajo" 
     modal 
@@ -119,7 +144,7 @@ const updateEspacio = async () => {
                     class="w-full"
                     :class="{ 'p-invalid': serverErrors.name }"
                 />
-                <small v-if="serverErrors.name" class="text-red-500">{{ serverErrors.name[0] }}</small>
+                <small v-if="serverErrors.name" class="text-red-500">{{ serverErrors.name?.[0] }}</small>
             </div>
 
             <!-- Estado -->
@@ -143,7 +168,7 @@ const updateEspacio = async () => {
                     class="w-full"
                     :class="{ 'p-invalid': serverErrors.description }" 
                 />
-                <small v-if="serverErrors.description" class="text-red-500">{{ serverErrors.description[0] }}</small>
+                <small v-if="serverErrors.description" class="text-red-500">{{ serverErrors.description?.[0] }}</small>
             </div>
 
         </div>

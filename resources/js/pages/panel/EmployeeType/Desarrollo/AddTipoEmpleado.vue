@@ -42,9 +42,9 @@
     </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
@@ -52,51 +52,59 @@ import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Tag from 'primevue/tag';
 import { useToast } from 'primevue/usetoast';
-import { defineEmits } from 'vue';
 import ToolsEmployeeType from './toolsEmployeeType.vue';
+
+interface TipoEmpleado {
+    name: string;
+    state: boolean;
+}
+
+interface ServerErrors {
+    [key: string]: string[];
+}
 
 const toast = useToast();
 const submitted = ref(false);
 const tipoEmpleadoDialog = ref(false);
-const serverErrors = ref({});
-const emit = defineEmits(['tipo-empleado-agregado']);
-
-const tipoEmpleado = ref({
+const serverErrors = ref<ServerErrors>({});
+const tipoEmpleado = ref<TipoEmpleado>({
     name: '',
     state: true
 });
+
+const emit = defineEmits<{
+    (e: 'tipo-empleado-agregado'): void
+}>();
+
 // Método para recargar la lista de tipos de empleado
-const loadTipoEmpleado = async () => {
+const loadTipoEmpleado = async (): Promise<void> => {
     try {
-        const response = await axios.get('/tipos_empleados');  // Aquí haces una solicitud GET para obtener los tipos de empleado
+        const response = await axios.get('/tipos_empleados'); 
         console.log(response.data);
-        // Realiza lo que necesites con la respuesta, como actualizar el listado en un componente superior
-        emit('tipos_empleados-agregada');  // Si quieres que un componente padre reciba la notificación de la actualización
+        emit('tipo-empleado-agregado');
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar los tipos de empleado', life: 3000 });
         console.error(error);
     }
 }
-function resetTipoEmpleado() {
-    tipoEmpleado.value = {
-        name: '',
-        state: true
-    };
+
+function resetTipoEmpleado(): void {
+    tipoEmpleado.value = { name: '', state: true };
     serverErrors.value = {};
     submitted.value = false;
 }
 
-function openNew() {
+function openNew(): void {
     resetTipoEmpleado();
     tipoEmpleadoDialog.value = true;
 }
 
-function hideDialog() {
+function hideDialog(): void {
     tipoEmpleadoDialog.value = false;
     resetTipoEmpleado();
 }
 
-function guardarTipoEmpleado() {
+function guardarTipoEmpleado(): void {
     submitted.value = true;
     serverErrors.value = {};
 
@@ -106,9 +114,9 @@ function guardarTipoEmpleado() {
             hideDialog();
             emit('tipo-empleado-agregado');
         })
-        .catch(error => {
+        .catch((error: AxiosError) => {
             if (error.response && error.response.status === 422) {
-                serverErrors.value = error.response.data.errors || {};
+                serverErrors.value = (error.response.data as any).errors || {};
             } else {
                 toast.add({
                     severity: 'error',

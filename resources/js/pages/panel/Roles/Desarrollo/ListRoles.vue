@@ -1,10 +1,17 @@
 <template>
     <div>
-        <DataTable ref="dt" v-model:selection="selectedRol" :value="rol" dataKey="id" :paginator="true" :rows="10"
+        <DataTable 
+            ref="dt" 
+            v-model:selection="selectedRol" 
+            :value="rol" 
+            dataKey="id" 
+            :paginator="true" 
+            :rows="10"
             :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             :rowsPerPageOptions="[5, 10, 25]"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} roles">
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} roles"
+        >
             <template #header>
                 <div class="flex flex-wrap gap-2 items-center justify-between">
                     <h4 class="m-0">Roles y Permisos</h4>
@@ -51,9 +58,9 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { FilterMatchMode } from '@primevue/core/api';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -64,44 +71,55 @@ import Button from 'primevue/button';
 import DeleteRoles from './DeleteRoles.vue';
 import UpdateRoles from './UpdateRoles.vue';
 
-const dt = ref();
-const rol = ref([]);
-const selectedRol = ref();
-const rolToDelete = ref(null);
-const selectedrolId = ref(null);
+// Interfaces
+interface Rol {
+    id: number;
+    name: string;
+    created_at?: string;
+    updated_at?: string;
+    permissions?: any[]; // Opcional, dependiendo si lo necesitas
+}
+
+// Refs
+const dt = ref<any>(null);
+const rol = ref<Rol[]>([]);
+const selectedRol = ref<Rol[] | null>(null);
+const rolToDelete = ref<Rol | null>(null);
+const selectedrolId = ref<number | null>(null);
 const updaterolDialog = ref(false);
 const deleteRolDialog = ref(false);
 
-const filters = ref({
+const filters = ref<Record<string, { value: string | null; matchMode: string }>>({
     'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
-const props = defineProps({
-    refresh: {
-        type: Number,
-        required: true
-    }
-});
+// Props
+const props = defineProps<{
+    refresh: number;
+}>();
 
+// Watch para refrescar datos
 watch(() => props.refresh, () => {
     fetchRoles();
 });
 
+// Función para obtener roles
 const fetchRoles = async () => {
     try {
-        const response = await axios.get('/rol');
+        const response: AxiosResponse<{ data: Rol[] }> = await axios.get('/rol');
         rol.value = response.data.data;
     } catch (error) {
         console.error('Error al cargar los roles:', error);
     }
 };
 
-function editrol(rol) {
-    selectedrolId.value = rol.id;
+// Funciones de acción
+function editrol(selected: Rol) {
+    selectedrolId.value = selected.id;
     updaterolDialog.value = true;
 }
 
-function confirmDeleteRol(selected) {
+function confirmDeleteRol(selected: Rol) {
     rolToDelete.value = selected;
     deleteRolDialog.value = true;
 }
@@ -114,6 +132,7 @@ function handleRolUpdated() {
     fetchRoles();
 }
 
+// onMounted
 onMounted(() => {
     fetchRoles();
 });

@@ -1,129 +1,3 @@
-<script setup>
-import { ref, onMounted, watch } from 'vue';
-import Button from 'primevue/button';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/inputtext';
-import Tag from 'primevue/tag';
-import axios from 'axios';
-import { debounce } from 'lodash';
-import Select from 'primevue/select';
-import DeleteTipoEmpleado from './DeleteTipoEmpleado.vue';
-import UpdateTipoEmpleado from './UpdateTipoEmpleado.vue';
-
-const dt = ref();
-const tiposEmpleados = ref([]);
-const selectedTiposEmpleados = ref();
-const loading = ref(false);
-const globalFilterValue = ref('');
-const deleteTipoEmpleadoDialog = ref(false);
-const tipoEmpleado = ref({});
-const selectedTipoEmpleadoId = ref(null);
-const selectedEstadoTipoEmpleado = ref(null);
-const updateTipoEmpleadoDialog = ref(false);
-const currentPage = ref(1);
-
-const props = defineProps({
-    refresh: {
-        type: Number,
-        required: true
-    }
-});
-
-watch(() => props.refresh, () => {
-    loadTipoEmpleado();
-});
-
-watch(() => selectedEstadoTipoEmpleado.value, () => {
-    currentPage.value = 1;
-    loadTipoEmpleado();
-});
-
-const estadoTipoEmpleadoOptions = ref([
-    { name: 'TODOS', value: '' },
-    { name: 'ACTIVOS', value: 1 },
-    { name: 'INACTIVOS', value: 0 },
-]);
-
-const pagination = ref({
-    currentPage: 1,
-    perPage: 15,
-    total: 0
-});
-
-const filters = ref({
-    state: null,
-    online: null
-});
-
-function editTipoEmpleado(te) {
-    selectedTipoEmpleadoId.value = te.id;
-    updateTipoEmpleadoDialog.value = true;
-}
-
-function confirmDeleteTipoEmpleado(selected) {
-    tipoEmpleado.value = selected;
-    deleteTipoEmpleadoDialog.value = true;
-}
-
-function handleTipoEmpleadoUpdated() {
-    loadTipoEmpleado();
-}
-
-function handleTipoEmpleadoDeleted() {
-    loadTipoEmpleado();
-}
-
-const loadTipoEmpleado = async () => {
-    loading.value = true;
-    try {
-        const params = {
-            page: pagination.value.currentPage,
-            per_page: pagination.value.perPage,
-            search: globalFilterValue.value,
-            state: filters.value.state,
-        };
-
-        if (selectedEstadoTipoEmpleado.value !== null && selectedEstadoTipoEmpleado.value.value !== '') {
-            params.state = selectedEstadoTipoEmpleado.value.value;
-        }
-
-        const response = await axios.get('/tipo_empleado', { params });
-
-        tiposEmpleados.value = response.data.data;
-        pagination.value.currentPage = response.data.meta.current_page;
-        pagination.value.total = response.data.meta.total;
-    } catch (error) {
-        console.error('Error al cargar tipos empleados:', error);
-    } finally {
-        loading.value = false;
-    }
-};
-
-const onPage = (event) => {
-    pagination.value.currentPage = event.page + 1;
-    pagination.value.perPage = event.rows;
-    loadTipoEmpleado();
-};
-
-const getSeverity = (value) => {
-    if (value === true || value === '1') return 'success';
-    if (value === false || value === '0') return 'danger';
-    return null;
-};
-
-const onGlobalSearch = debounce(() => {
-    pagination.value.currentPage = 1;
-    loadTipoEmpleado();
-}, 500);
-
-onMounted(() => {
-    loadTipoEmpleado();
-});
-</script>
-
 <template>
     <DataTable
         ref="dt"
@@ -197,3 +71,128 @@ onMounted(() => {
         @updated="handleTipoEmpleadoUpdated"
     />
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
+import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import InputText from 'primevue/inputtext';
+import Tag from 'primevue/tag';
+import Select from 'primevue/select';
+import axios from 'axios';
+import { debounce } from 'lodash';
+import DeleteTipoEmpleado from './DeleteTipoEmpleado.vue';
+import UpdateTipoEmpleado from './UpdateTipoEmpleado.vue';
+
+// Interfaces
+interface TipoEmpleado {
+    id: number;
+    name: string;
+    state: boolean | number;
+    creacion?: string;
+    actualizacion?: string;
+    [key: string]: any;
+}
+
+// Props tipadas
+const props = defineProps<{
+    refresh: number;
+}>();
+
+// Refs tipadas
+const dt = ref<any>(null);
+const tiposEmpleados = ref<TipoEmpleado[]>([]);
+const selectedTiposEmpleados = ref<TipoEmpleado[] | null>(null);
+const loading = ref<boolean>(false);
+const globalFilterValue = ref<string>('');
+const deleteTipoEmpleadoDialog = ref<boolean>(false);
+const tipoEmpleado = ref<TipoEmpleado | null>(null);
+const selectedTipoEmpleadoId = ref<number | null>(null);
+const selectedEstadoTipoEmpleado = ref<{ name: string; value: any } | null>(null);
+const updateTipoEmpleadoDialog = ref<boolean>(false);
+const currentPage = ref<number>(1);
+
+// Watchers
+watch(() => props.refresh, () => loadTipoEmpleado());
+watch(() => selectedEstadoTipoEmpleado.value, () => {
+    currentPage.value = 1;
+    loadTipoEmpleado();
+});
+
+// Opciones de estado
+const estadoTipoEmpleadoOptions = ref([
+    { name: 'TODOS', value: '' },
+    { name: 'ACTIVOS', value: 1 },
+    { name: 'INACTIVOS', value: 0 },
+]);
+
+// Paginación
+const pagination = ref({
+    currentPage: 1,
+    perPage: 15,
+    total: 0
+});
+
+// Filtros
+const filters = ref<{ state: any; online?: any }>({ state: null });
+
+// Funciones
+const editTipoEmpleado = (te: TipoEmpleado) => {
+    selectedTipoEmpleadoId.value = te.id;
+    updateTipoEmpleadoDialog.value = true;
+};
+
+const confirmDeleteTipoEmpleado = (selected: TipoEmpleado) => {
+    tipoEmpleado.value = selected;
+    deleteTipoEmpleadoDialog.value = true;
+};
+
+const handleTipoEmpleadoUpdated = () => loadTipoEmpleado();
+const handleTipoEmpleadoDeleted = () => loadTipoEmpleado();
+
+const loadTipoEmpleado = async (): Promise<void> => {
+    loading.value = true;
+    try {
+        const params: Record<string, any> = {
+            page: pagination.value.currentPage,
+            per_page: pagination.value.perPage,
+            search: globalFilterValue.value,
+            state: filters.value.state,
+        };
+
+        if (selectedEstadoTipoEmpleado.value !== null && selectedEstadoTipoEmpleado.value.value !== '') {
+            params.state = selectedEstadoTipoEmpleado.value.value;
+        }
+
+        const response = await axios.get('/tipo_empleado', { params });
+        tiposEmpleados.value = response.data.data;
+        pagination.value.currentPage = response.data.meta.current_page;
+        pagination.value.total = response.data.meta.total;
+    } catch (error) {
+        console.error('Error al cargar tipos empleados:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const onPage = (event: { page: number; rows: number }) => {
+    pagination.value.currentPage = event.page + 1;
+    pagination.value.perPage = event.rows;
+    loadTipoEmpleado();
+};
+
+const getSeverity = (value: boolean | number): 'success' | 'danger' | undefined => {
+    const boolValue = value === true || value === 1 ;
+    return boolValue ? 'success' : value === false || value === 0 ? 'danger' : undefined;
+};
+
+const onGlobalSearch = debounce(() => {
+    pagination.value.currentPage = 1;
+    loadTipoEmpleado();
+}, 500);
+
+onMounted(() => loadTipoEmpleado());
+</script>

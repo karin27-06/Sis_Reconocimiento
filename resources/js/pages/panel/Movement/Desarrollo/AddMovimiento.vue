@@ -88,9 +88,9 @@
     </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
@@ -99,15 +99,34 @@ import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
 
+// Tipos
+interface Movimiento {
+    idEspacio: number | null;
+    idTipo: string;
+    reconocido: boolean;
+    access: boolean;
+    error: string;
+    fechaEnvioESP32: string;
+    fechaRecepcion: string;
+    fechaReconocimiento: string;
+}
+
+interface Espacio {
+    id: number;
+    name: string;
+}
+
+// Refs
 const toast = useToast();
 const submitted = ref(false);
 const movimientoDialog = ref(false);
-const serverErrors = ref({});
-const espacios = ref([]);
+const serverErrors = ref<Record<string, string[]>>({});
+const espacios = ref<Espacio[]>([]);
+const emit = defineEmits<{
+    (e: 'movimiento-agregado'): void
+}>();
 
-const emit = defineEmits(['movimiento-agregado']);
-
-const movimiento = ref({
+const movimiento = ref<Movimiento>({
     idEspacio: null,
     idTipo: '',
     reconocido: false,
@@ -149,7 +168,7 @@ function resetMovimiento() {
 
 // Cargar espacios
 function fetchEspacios() {
-    axios.get('/espacio' , { params: { state: 1 } })
+    axios.get<{ data: Espacio[] }>('/espacio', { params: { state: 1 } })
         .then(res => {
             espacios.value = res.data.data;
         })
@@ -171,7 +190,7 @@ function guardarMovimiento() {
             hideDialog();
             emit('movimiento-agregado');
         })
-        .catch(error => {
+        .catch((error: AxiosError<{ errors?: Record<string, string[]> }>) => {
             if (error.response && error.response.status === 422) {
                 serverErrors.value = error.response.data.errors || {};
             } else {

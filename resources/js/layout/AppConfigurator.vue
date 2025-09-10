@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
 import { $t, updatePreset, updateSurfacePalette } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
@@ -9,21 +9,36 @@ import SelectButton from 'primevue/selectbutton';
 
 const { layoutConfig, isDarkTheme } = useLayout();
 
-const presets = {
+// Tipado para colores primarios
+interface ColorPalette {
+    [key: string]: string;
+}
+
+interface ThemeColor {
+    name: string;
+    palette: ColorPalette;
+}
+
+interface SurfaceColor {
+    name: string;
+    palette: ColorPalette;
+}
+
+const presets: Record<string, unknown> = {
     Aura,
     Lara,
     Nora
 };
-const preset = ref(layoutConfig.preset);
-const presetOptions = ref(Object.keys(presets));
+const preset = ref<string>(layoutConfig.preset);
+const presetOptions = ref<string[]>(Object.keys(presets));
 
-const menuMode = ref(layoutConfig.menuMode);
-const menuModeOptions = ref([
+const menuMode = ref<string>(layoutConfig.menuMode);
+const menuModeOptions = ref<{ label: string; value: string }[]>([
     { label: 'Static', value: 'static' },
     { label: 'Overlay', value: 'overlay' }
 ]);
 
-const primaryColors = ref([
+const primaryColors = ref<ThemeColor[]>([
     { name: 'noir', palette: {} },
     { name: 'emerald', palette: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' } },
     { name: 'green', palette: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d', 950: '#052e16' } },
@@ -43,7 +58,7 @@ const primaryColors = ref([
     { name: 'rose', palette: { 50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337', 950: '#4c0519' } }
 ]);
 
-const surfaces = ref([
+const surfaces = ref<SurfaceColor[]>([
     {
         name: 'slate',
         palette: { 0: '#ffffff', 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
@@ -82,7 +97,7 @@ const surfaces = ref([
 const STORAGE_KEY = 'theme-preferences';
 
 // Function to save current settings to localStorage
-function saveToLocalStorage() {
+function saveToLocalStorage(): void {
     const settings = {
         primary: layoutConfig.primary,
         surface: layoutConfig.surface,
@@ -93,13 +108,17 @@ function saveToLocalStorage() {
 }
 
 // Function to load settings from localStorage
-function loadFromLocalStorage() {
+function loadFromLocalStorage(): void {
     try {
         const savedSettings = localStorage.getItem(STORAGE_KEY);
         if (savedSettings) {
-            const settings = JSON.parse(savedSettings);
+            const settings = JSON.parse(savedSettings) as {
+                primary?: string;
+                surface?: string;
+                preset?: string;
+                menuMode?: string;
+            };
             
-            // Update reactive refs with saved values
             if (settings.primary) {
                 layoutConfig.primary = settings.primary;
                 const primaryColor = primaryColors.value.find(c => c.name === settings.primary);
@@ -107,7 +126,7 @@ function loadFromLocalStorage() {
                     applyTheme('primary', primaryColor);
                 }
             }
-            
+
             if (settings.surface) {
                 layoutConfig.surface = settings.surface;
                 const surfaceColor = surfaces.value.find(s => s.name === settings.surface);
@@ -115,12 +134,12 @@ function loadFromLocalStorage() {
                     applyTheme('surface', surfaceColor);
                 }
             }
-            
+
             if (settings.preset) {
                 preset.value = settings.preset;
                 onPresetChange();
             }
-            
+
             if (settings.menuMode) {
                 menuMode.value = settings.menuMode;
                 layoutConfig.menuMode = settings.menuMode;
@@ -132,7 +151,7 @@ function loadFromLocalStorage() {
 }
 
 function getPresetExt() {
-    const color = primaryColors.value.find((c) => c.name === layoutConfig.primary);
+    const color = primaryColors.value.find((c) => c.name === layoutConfig.primary)!;
 
     if (color.name === 'noir') {
         return {
@@ -221,7 +240,7 @@ function getPresetExt() {
     }
 }
 
-function updateColors(type, color) {
+function updateColors(type: 'primary' | 'surface', color: ThemeColor | SurfaceColor): void {
     if (type === 'primary') {
         layoutConfig.primary = color.name;
     } else if (type === 'surface') {
@@ -229,12 +248,10 @@ function updateColors(type, color) {
     }
 
     applyTheme(type, color);
-    
-    // Save changes to localStorage
     saveToLocalStorage();
 }
 
-function applyTheme(type, color) {
+function applyTheme(type: 'primary' | 'surface', color: ThemeColor | SurfaceColor): void {
     if (type === 'primary') {
         updatePreset(getPresetExt());
     } else if (type === 'surface') {
@@ -242,21 +259,17 @@ function applyTheme(type, color) {
     }
 }
 
-function onPresetChange() {
+function onPresetChange(): void {
     layoutConfig.preset = preset.value;
     const presetValue = presets[preset.value];
     const surfacePalette = surfaces.value.find((s) => s.name === layoutConfig.surface)?.palette;
 
     $t().preset(presetValue).preset(getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
-    
-    // Save changes to localStorage
     saveToLocalStorage();
 }
 
-function onMenuModeChange() {
+function onMenuModeChange(): void {
     layoutConfig.menuMode = menuMode.value;
-    
-    // Save changes to localStorage
     saveToLocalStorage();
 }
 

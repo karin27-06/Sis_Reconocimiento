@@ -4,7 +4,6 @@
             <Button label="Nuevo rol" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
         </template>
         <template #end>
-
         </template>
     </Toolbar>
 
@@ -12,7 +11,7 @@
         <div class="flex flex-col gap-6">
             <div>
                 <label for="name" class="block font-bold mb-3">Nombre <span class="text-red-500">*</span></label>
-                <InputText id="name" v-model.trim="rol.name" required maxlength="100" fluid />
+                <InputText id="name" v-model="rol.name" required maxlength="100" class="w-full" />
                 <small v-if="submitted && !rol.name" class="text-red-500">El nombre es obligatorio.</small>
                 <small v-else-if="submitted && rol.name && rol.name.length < 2" class="text-red-500">
                     El nombre debe tener al menos 2 caracteres.
@@ -72,32 +71,50 @@
     </Dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
-import { useToast } from 'primevue/usetoast';
-import { defineEmits } from 'vue';
 import Fieldset from 'primevue/fieldset';
+import { useToast } from 'primevue/usetoast';
 
+// Tipos
+interface Rol {
+    name: string;
+}
+
+interface Permiso {
+    id: number;
+    name: string;
+}
+
+interface ServerErrors {
+    [key: string]: string[];
+}
+interface ErrorResponse {
+  errors?: Record<string, string[]>;
+}
+
+// Refs
 const toast = useToast();
 const submitted = ref(false);
 const rolDialog = ref(false);
-const selectedrols = ref();
-const serverErrors = ref({});
-const emit = defineEmits(['rol-agregado']);
-const rol = ref({
-    name: '',
-});
-
-const permisos = ref([]);
-const permisosSeleccionados = ref([]);
+const serverErrors = ref<ServerErrors>({});
+const rol = ref<Rol>({ name: '' });
+const permisos = ref<Permiso[]>([]);
+const permisosSeleccionados = ref<number[]>([]);
 const loadingPermissions = ref(false);
 
+// Emit
+const emit = defineEmits<{
+    (e: 'rol-agregado'): void;
+}>();
+
+// Funciones
 async function obtenerPermisos() {
     loadingPermissions.value = true;
     try {
@@ -117,44 +134,35 @@ async function obtenerPermisos() {
 }
 
 const permisosAgrupados = computed(() => {
-    const grupos = {};
+    const grupos: Record<string, Permiso[]> = {};
 
     permisos.value.forEach(permiso => {
         const nombrePartes = permiso.name.split(' ');
-        const categoria = nombrePartes.length > 1 ? nombrePartes[1] : "General";
+        const categoria = nombrePartes.length > 1 ? nombrePartes[1] : 'General';
 
-        if (!grupos[categoria]) {
-            grupos[categoria] = [];
-        }
-
+        if (!grupos[categoria]) grupos[categoria] = [];
         grupos[categoria].push(permiso);
     });
 
     return grupos;
 });
 
-function seleccionarTodos(categoria) {
+function seleccionarTodos(categoria: string) {
     const nuevosSeleccionados = [...permisosSeleccionados.value];
     const permisosCategoria = permisosAgrupados.value[categoria].map(p => p.id);
     permisosCategoria.forEach(id => {
-        if (!nuevosSeleccionados.includes(id)) {
-            nuevosSeleccionados.push(id);
-        }
+        if (!nuevosSeleccionados.includes(id)) nuevosSeleccionados.push(id);
     });
     permisosSeleccionados.value = nuevosSeleccionados;
 }
 
-function deseleccionarTodos(categoria) {
+function deseleccionarTodos(categoria: string) {
     const permisosCategoria = permisosAgrupados.value[categoria].map(p => p.id);
-    permisosSeleccionados.value = permisosSeleccionados.value.filter(
-        id => !permisosCategoria.includes(id)
-    );
+    permisosSeleccionados.value = permisosSeleccionados.value.filter(id => !permisosCategoria.includes(id));
 }
 
 function openNew() {
-    rol.value = {
-        name: '',
-    };
+    rol.value = { name: '' };
     permisosSeleccionados.value = [];
     submitted.value = false;
     serverErrors.value = {};
@@ -175,28 +183,29 @@ function guardarRol() {
             name: rol.value.name,
             permissions: permisosSeleccionados.value
         })
-            .then(response => {
+        .then(() => {
+            toast.add({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: 'Rol guardado correctamente',
+                life: 3000
+            });
+            hideDialog();
+            emit('rol-agregado');
+        })
+        .catch((error) => {
+            const err = error as AxiosError<ErrorResponse>;
+            if (err.response?.data?.errors) {
+                serverErrors.value = err.response.data.errors;
+            } else {
                 toast.add({
-                    severity: 'success',
-                    summary: 'Éxito',
-                    detail: 'Rol guardado correctamente',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Error al guardar el rol',
                     life: 3000
                 });
-                hideDialog();
-                emit('rol-agregado');
-            })
-            .catch(error => {
-                if (error.response && error.response.data && error.response.data.errors) {
-                    serverErrors.value = error.response.data.errors;
-                } else {
-                    toast.add({
-                        severity: 'error',
-                        summary: 'Error',
-                        detail: 'Error al guardar el rol',
-                        life: 3000
-                    });
-                }
-            });
+            }
+        });
     }
 }
 
@@ -206,5 +215,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Puedes añadir estilos adicionales aquí si es necesario */
+.permisos-container {
+    max-height: 500px;
+    overflow-y: auto;
+}
 </style>
