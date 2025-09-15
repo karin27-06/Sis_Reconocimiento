@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Reportes\EmployeeTypePDFController;
 use App\Http\Controllers\Reportes\EmployeePDFController;
 use App\Http\Controllers\Api\DashboardController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
+use App\Http\Controllers\Web\AlertWebController;
 use App\Http\Controllers\Web\EmployeeTypeWebController;
 use App\Http\Controllers\Web\EmployeeWebController;
 use App\Http\Controllers\Web\MovementWebController;
@@ -43,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/espacios', [SpaceWebController::class, 'index'])->name('index.view');
     Route::get('/empleados', [EmployeeWebController::class, 'index'])->name('index.view');
     Route::get('/movimientos', [MovementWebController::class, 'index'])->name('index.view');
+    Route::get('/alertas', [AlertWebController::class, 'index'])->name('index.view');
     Route::get('/tipo_empleados', [EmployeeTypeWebController::class, 'index'])->name('index.view');
     Route::get('/usuario', [UsuarioWebController::class, 'index'])->name('index.view');
     Route::get('/roles', [UsuarioWebController::class, 'roles'])->name('roles.view');
@@ -86,6 +89,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{movement}', [MovementController::class, 'show'])->name('movimientos.show');
         Route::put('{movement}', [MovementController::class, 'update'])->name('movimientos.update');
         Route::delete('{movement}', [MovementController::class, 'destroy'])->name('movimientos.destroy');
+    });
+
+    #ALERTA => BACKEND
+    Route::prefix('alerta')->group(function () {
+        Route::get('/', [AlertController::class, 'index'])->name('alerta.index');
+        Route::post('/', [AlertController::class, 'store'])->name('alertas.store');
+        Route::get('{alert}', [AlertController::class, 'show'])->name('alertas.show');
+        Route::put('{alert}', [AlertController::class, 'update'])->name('alertas.update');
+        Route::delete('{alert}', [AlertController::class, 'destroy'])->name('alertas.destroy');
     });
 
     #TIPOS DE EMPLEADOS -> BACKEND
@@ -134,6 +146,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export-pdf-employeeTypes', [EmployeeTypePDFController::class, 'exportPDF'])->name('export-pdf-employeeTypes');
         // Ruta para importar desde Excel
         Route::post('/import-excel-employeeTypes', [EmployeeTypeController::class, 'importExcel'])->name('import-excel-employeeTypes');
+
+        #EXPORTACION Y IMPORTACION ALERTAS
+        Route::get('/export-excel-alerts', [AlertController::class, 'exportExcel'])->name('export-excel-alerts');
+        //Route::get('/export-pdf-alerts', [AlertPDFController::class, 'exportPDF'])->name('export-pdf-alerts');
+        // Ruta para importar desde Excel
+        Route::post('/import-excel-alerts', [AlertController::class, 'importExcel'])->name('import-excel-alerts');
 
         #EXPORTACION Y IMPORTACION MOVIMIENTOS
         Route::get('/export-excel-movements', [MovementController::class, 'exportExcel'])->name('export-excel-movements');

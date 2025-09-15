@@ -60,6 +60,12 @@ const model = computed<MenuItem[]>(() => [
             },
         ].filter(Boolean) as MenuItem[],
     },
+    {
+        label: 'Gestion de Alertas',
+        items: [
+            hasPermission('ver alertas') && { label: 'Alertas', icon: 'pi pi-fw pi-briefcase', to: '/alertas' },
+        ].filter(Boolean) as MenuItem[],
+    },
 ].filter(section => section.items && section.items.length > 0) as MenuItem[]);
 </script>
 
