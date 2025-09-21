@@ -49,13 +49,13 @@ const loading = ref(false)
 const downloadingText = ref('')
 
 const startDownload = async (type: 'pdf' | 'excel') => {
-  // Rutas para Employees
+  // Rutas para Movements
   const url = type === 'pdf' 
-    ? '/panel/reports/export-pdf-employees' 
-    : '/panel/reports/export-excel-employees'
+    ? '/panel/reports/export-pdf-movements' 
+    : '/panel/reports/export-excel-movements'
 
-  // Nombre de archivo
-  const filename = type === 'pdf' ? 'Empleados.pdf' : 'Empleados.xlsx'
+  // Nombre de archivo amigable
+  const filename = type === 'pdf' ? 'Movimientos.pdf' : 'Movimientos.xlsx'
 
   try {
     loading.value = true

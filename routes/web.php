@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\MovementController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Reportes\MovementPDFController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
 use App\Http\Controllers\Web\AlertWebController;
@@ -168,7 +169,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         #EXPORTACION Y IMPORTACION MOVIMIENTOS
         Route::get('/export-excel-movements', [MovementController::class, 'exportExcel'])->name('export-excel-movements');
-        //Route::get('/export-pdf-movements', [MovementPDFController::class, 'exportPDF'])->name('export-pdf-movements');
+        Route::get('/export-pdf-movements', [MovementPDFController::class, 'exportPDF'])->name('export-pdf-movements');
         // Ruta para importar desde Excel
         Route::post('/import-excel-movements', [MovementController::class, 'importExcel'])->name('import-excel-movements');
 

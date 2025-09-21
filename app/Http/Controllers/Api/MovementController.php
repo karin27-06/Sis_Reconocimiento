@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\MovementExport;
 use App\Http\Controllers\Controller;
 use App\Exports\MovementsExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -73,9 +74,9 @@ class MovementController extends Controller
         ]);
     }
 
-    // EXPORTACIÓN
-    /*public function exportExcel()
+    #EXPORTACION
+    public function exportExcel()
     {
-        return Excel::download(new MovementsExport, 'Movimientos.xlsx');
-    }*/
+        return Excel::download(new MovementExport, 'Movimientos.xlsx');
+    }
 }

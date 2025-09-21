@@ -21,9 +21,10 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
     {
         return [
             $employee->id,
-            $employee->name,
+            trim($employee->name . ' ' . $employee->apellido),
             $employee->codigo,
             $employee->empleadoType->name,
+            $employee->idHuella ?? 'No asignado',
             $employee->state == 1 ? 'Activo' : 'Inactivo',
             $employee->created_at->format('d-m-Y H:i:s'), // Fecha de creación formateada
             $employee->updated_at->format('d-m-Y H:i:s')  // Fecha de actualización formateada
@@ -33,10 +34,10 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
     {
         // Este array define los encabezados en la fila 3
     return [
-        ['LISTA DE EMPLEADOS', '', '', '', '', '', ''],  // Fila 1 con el título
-        [],  // Fila 2 en blanco (espaciado entre el título y los encabezados)
-        ['ID', 'Nombre', 'Código', 'Tipo de empleado', 'Estado', 'Creación', 'Actualización']  // Fila 3 con los encabezados
-    ];
+            ['LISTA DE EMPLEADOS', '', '', '', '', '', '', ''],
+            [],
+            ['ID', 'Nombre Completo', 'Código', 'Tipo de empleado', 'ID Huella', 'Estado', 'Creación', 'Actualización']
+        ];
 
     }
     public function startCell(): string
@@ -47,8 +48,8 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
     public function styles(Worksheet $sheet)
     {
         // Estilos para las celdas
-        $sheet->mergeCells('A1:G1');
-        $sheet->getStyle('A1:G1')->applyFromArray([
+        $sheet->mergeCells('A1:H1');
+        $sheet->getStyle('A1:H1')->applyFromArray([
             'font' => ['bold' => true,'size' => 14],
             'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
             'fill' => [
@@ -58,7 +59,7 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
         ]);
 
         // Estilo para los encabezados de la tabla
-        $sheet->getStyle('A3:G3')->applyFromArray([
+        $sheet->getStyle('A3:H3')->applyFromArray([
         'font' => [
             'bold' => true,
         ],
@@ -78,7 +79,7 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
         ]);
 
         // Estilo para las filas de datos
-        $sheet->getStyle('A4:G' . $sheet->getHighestRow())->applyFromArray([
+        $sheet->getStyle('A4:H' . $sheet->getHighestRow())->applyFromArray([
             'alignment' => [
                 'horizontal' => 'center',
                 'vertical' => 'center',
@@ -90,7 +91,7 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
             ],
         ]);
         // Ajuste de las columnas para darles más espacio
-        foreach (range('A', 'G') as $column) {
+        foreach (range('A', 'H') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
         return [];
