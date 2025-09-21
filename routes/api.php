@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AlertController;
+use App\Http\Controllers\Api\ConfigAlertController;
 use App\Http\Controllers\Api\EmployeeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\EmployeeTypeController;
@@ -21,6 +22,7 @@ Route::get('/verificar-acceso', function () {
 Route::middleware('auth')->group(function () {
     Route::apiResource('tipos_empleados', EmployeeType::class);
     Route::apiResource('empleado', EmployeeController::class);
+    Route::apiResource('config_alertas', ConfigAlertController::class);
     Route::apiResource('movimiento', MovementController::class);
     Route::apiResource('alerta', AlertController::class);
     Route::apiResource('horario', ScheduleController::class);

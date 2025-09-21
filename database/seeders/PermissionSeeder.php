@@ -56,5 +56,10 @@ class PermissionSeeder extends Seeder{
         Permission::create(['name' => 'editar alertas']);
         Permission::create(['name' => 'eliminar alertas']);
         Permission::create(['name' => 'ver alertas']);
+         # Configuracion de alertas
+        Permission::create(['name' => 'crear configuraciones de alerta']);
+        Permission::create(['name' => 'editar configuraciones de alerta']);
+        Permission::create(['name' => 'eliminar configuraciones de alerta']);
+        Permission::create(['name' => 'ver configuraciones de alerta']);
     }
 }

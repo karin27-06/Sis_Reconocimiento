@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             EmployeeTypeSeeder::class,
             //development
             SpaceSeeder::class,
+            ConfigAlertSeeder::class,
             //development
         ]);
     }

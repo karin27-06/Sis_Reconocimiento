@@ -63,7 +63,8 @@ const model = computed<MenuItem[]>(() => [
     {
         label: 'Gestion de Alertas',
         items: [
-            hasPermission('ver alertas') && { label: 'Alertas', icon: 'pi pi-fw pi-briefcase', to: '/alertas' },
+            hasPermission('ver alertas') && { label: 'Alertas', icon: 'pi pi-fw pi-bell', to: '/alertas' },
+            hasPermission('ver configuraciones de alerta') && { label: 'Configuración de alertas', icon: 'pi pi-fw pi-cog', to: '/config_alertas' },
         ].filter(Boolean) as MenuItem[],
     },
 ].filter(section => section.items && section.items.length > 0) as MenuItem[]);
