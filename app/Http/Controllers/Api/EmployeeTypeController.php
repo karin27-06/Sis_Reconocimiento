@@ -90,20 +90,7 @@ class EmployeeTypeController extends Controller{
     #EXPORTACION
     public function exportExcel()
     {
+        set_time_limit(0);
         return Excel::download(new EmployeeTypesExport, 'Tipo_empleados.xlsx');
-    }
-
-    #IMPORTACION
-    public function importExcel(Request $request)
-    {
-        $request->validate([
-            'archivo' => 'required|file|mimes:xlsx,xls,csv'
-        ]);
-    
-        Excel::import(new EmployeeTypeImport, $request->file('archivo'));
-    
-        return response()->json([
-            'message' => 'Importación de los tipos de empleado realizada correctamente.'
-        ]);
     }
 }

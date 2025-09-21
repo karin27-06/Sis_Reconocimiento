@@ -129,6 +129,7 @@ class EmployeeController extends Controller
     #EXPORTACION
     public function exportExcel()
     {
+        set_time_limit(0);
         return Excel::download(new EmployeesExport, 'Empleados.xlsx');
     }
 }
