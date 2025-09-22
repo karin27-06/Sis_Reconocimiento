@@ -68,6 +68,13 @@ class MovementController extends Controller
     public function destroy(Movement $movement)
     {
         Gate::authorize('delete', $movement);
+        if($movement->tieneRelaciones())
+        {
+            return response()->json([
+                'state'=>false,
+                'message'=> 'No se puede eliminar este movimiento porque tiene relaciones con otros registros.'
+            ],400);
+        }
         $movement->delete();
         return response()->json([
             'message' => 'Movimiento eliminado correctamente'

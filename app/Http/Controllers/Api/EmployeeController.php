@@ -118,7 +118,13 @@ class EmployeeController extends Controller
         if ($fotoPath && file_exists($fotoPath)) {
             unlink($fotoPath);
         }
-
+        if($employee->tieneRelaciones())
+        {
+            return response()->json([
+                'state'=>false,
+                'message'=> 'No se puede eliminar este empleado porque tiene relaciones con otros registros.'
+            ],400);
+        }
         $employee->delete();
 
         return response()->json([
