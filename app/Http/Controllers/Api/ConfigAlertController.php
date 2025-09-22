@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\ConfigAlertExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Config_alerta\StoreAlertConfigRequest;
 use App\Http\Requests\Config_alerta\UpdateAlertConfigRequest;
 use App\Http\Resources\ConfigAlertResource;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\ConfigAlert;
 use App\Pipelines\FilterByConfigAlert;
 use Illuminate\Http\Request;
@@ -79,5 +81,12 @@ class ConfigAlertController extends Controller
             'state' => true,
             'message' => 'Configuración de alerta eliminada correctamente.',
         ]);
+    }
+
+    # EXPORTACION
+    public function exportExcel()
+    {
+        set_time_limit(0);
+        return Excel::download(new ConfigAlertExport, 'ConfigAlertas.xlsx');
     }
 }

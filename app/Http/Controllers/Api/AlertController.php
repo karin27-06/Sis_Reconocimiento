@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Exports\AlertsExport;
 use App\Http\Requests\Alerta\StoreAlertRequest;
 use App\Http\Requests\Alerta\UpdateAlertRequest;
 use App\Http\Resources\AlertResource;
 use App\Models\Alert;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Pipelines\FilterByAlert;
 use App\Pipelines\FilterByTipo;
 use Illuminate\Http\Request;
@@ -78,5 +80,11 @@ class AlertController extends Controller
         return response()->json([
             'message' => 'Alerta eliminada correctamente.'
         ]);
+    }
+    # EXPORTACION
+    public function exportExcel()
+    {
+        set_time_limit(0);
+        return Excel::download(new AlertsExport, 'Alertas.xlsx');
     }
 }

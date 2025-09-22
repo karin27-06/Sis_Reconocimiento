@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 //use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Model
@@ -27,5 +29,15 @@ class Employee extends Model
 
     public function empleadoType(): BelongsTo{
         return $this->belongsTo(EmployeeType::class, 'employee_type_id', 'id');
+    }
+    
+    public function Schedules(): HasMany {
+        return $this->hasMany(Schedule::class, 'idEmpleado', 'id');
+    }
+
+    public function tieneRelaciones(): bool
+    {
+        //se agrega todas las relaciones que existan
+        return $this->Schedules()->exists();
     }
 }

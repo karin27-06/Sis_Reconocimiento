@@ -3,6 +3,9 @@
         <template #start>
             <Button label="Nueva Alerta" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
         </template>
+        <template #end>
+            <ToolsAlert />       
+        </template>
     </Toolbar>
 
     <Dialog 
@@ -80,6 +83,7 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
+import ToolsAlert from './toolsAlert.vue';
 
 // Tipos
 interface Alerta {
