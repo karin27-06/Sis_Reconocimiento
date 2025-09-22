@@ -16,10 +16,11 @@ class EmployeePDFController extends Controller
         $employeesArray = $employees->map(function ($employee) {
             return [
                 'id' => $employee->id,
-                'name' => $employee->name,
+                'full_name' => trim($employee->name . ' ' . $employee->apellido),
                 'codigo' => $employee->codigo,
                 'empleadoTipo_name' => $employee->empleadoType->name,
                 'state' => $employee->state == 1 ? 'Activo' : 'Inactivo',
+                'foto' => $employee->foto,
                 'created_at' => $employee->created_at,
                 'updated_at' => $employee->updated_at,
             ];
@@ -53,8 +54,8 @@ class EmployeePDFController extends Controller
         $pdf->SetFont('helvetica', 'B', 9);
         $pdf->SetFillColor(242, 242, 242);  // Color de fondo para los encabezados
 
-        $header = ['ID', 'Nombre', 'Código', 'Tipo de empleado', 'Estado', 'Creación', 'Actualización'];
-        $widths = [10, 40, 30, 30, 18, 30, 30]; // Tamaños adecuados para las celdas
+        $header = ['ID', 'Nombre Completo', 'Código', 'Tipo de empleado', 'Estado', 'Foto', 'Creación', 'Actualización'];
+        $widths = [10, 35, 25, 30, 18, 20, 25, 25];  // Tamaños adecuados para las celdas
         // Establecer los encabezados de la tabla en la primera página
         foreach ($header as $i => $col) {
             $pdf->MultiCell($widths[$i], 9, $col, 1, 'C', 1, 0);
@@ -64,30 +65,46 @@ class EmployeePDFController extends Controller
         // Imprimir los datos de los empleados
         $pdf->SetFont('helvetica', '', 7);
 
-        foreach ($employeesArray as $employee) {
-            // Si la posición Y está cerca del final de la página, añadir una nueva página y repetir los encabezados
-            if ($pdf->GetY() > 250) {
-                $pdf->AddPage(); // Añadir una nueva página
-                // Repetir los encabezados en la nueva página
-                $pdf->SetFont('helvetica', 'B', 7);
-                $pdf->SetFillColor(242, 242, 242);
-                foreach ($header as $i => $col) {
-                    $pdf->MultiCell($widths[$i], 7, $col, 1, 'C', 1, 0);
-                }
-                $pdf->Ln();
-            }
+        $rowHeight = 15; // Altura fija de la fila
 
-            // Asegurarse de que las celdas no se sobrepasen
-            $pdf->SetFont('helvetica', '', 7);
-            $pdf->MultiCell($widths[0], 7, $employee['id'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[1], 7, $employee['name'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[2], 7, $employee['codigo'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[3], 7, $employee['empleadoTipo_name'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[4], 7, $employee['state'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[5], 7, $employee['created_at'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[6], 7, $employee['updated_at'], 1, 'C', 0, 0);
-            $pdf->Ln();  // Salto de línea después de cada fila
-        }
+foreach ($employeesArray as $employee) {
+    if ($pdf->GetY() > 250) {
+        $pdf->AddPage();
+        // repetir encabezados
+    }
+
+    $pdf->SetFont('helvetica', '', 7);
+    $pdf->MultiCell($widths[0], $rowHeight, $employee['id'], 1, 'C', 0, 0);
+    $pdf->MultiCell($widths[1], $rowHeight, $employee['full_name'], 1, 'C', 0, 0);
+    $pdf->MultiCell($widths[2], $rowHeight, $employee['codigo'], 1, 'C', 0, 0);
+    $pdf->MultiCell($widths[3], $rowHeight, $employee['empleadoTipo_name'], 1, 'C', 0, 0);
+    $pdf->MultiCell($widths[4], $rowHeight, $employee['state'], 1, 'C', 0, 0);
+
+    // Celda para la imagen
+    $imgPath = public_path('uploads/fotos/empleados/' . $employee['foto']);
+    $x = $pdf->GetX();
+    $y = $pdf->GetY();
+    $pdf->MultiCell($widths[5], $rowHeight, '', 1, 'C', 0, 0); // Celda vacía
+
+    if(file_exists($imgPath)){
+        $imgWidth = 9; // ancho reducido
+        $imgHeight = $rowHeight - 4; // altura proporcional
+
+        // Calcular posición X centrada dentro de la celda
+        $centerX = $x + ($widths[5] - $imgWidth) / 2;
+
+        $pdf->Image($imgPath, $centerX, $y + 2, $imgWidth, $imgHeight, '', '', '', false, 300);
+    } else {
+        $pdf->SetXY($x, $y);
+        $pdf->MultiCell($widths[5], $rowHeight, 'No disponible', 1, 'C', 0, 0);
+    }
+
+    $pdf->MultiCell($widths[6], $rowHeight, $employee['created_at'], 1, 'C', 0, 0);
+    $pdf->MultiCell($widths[7], $rowHeight, $employee['updated_at'], 1, 'C', 0, 0);
+
+    $pdf->Ln($rowHeight); // Salto de línea con altura de fila
+}
+
         // Detenemos cualquier salida previa si la hay
         if (ob_get_length()) {
             ob_end_clean();

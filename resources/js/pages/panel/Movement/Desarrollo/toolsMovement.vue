@@ -49,11 +49,13 @@ const loading = ref(false)
 const downloadingText = ref('')
 
 const startDownload = async (type: 'pdf' | 'excel') => {
+  // Rutas para Movements
   const url = type === 'pdf' 
-    ? '/panel/reports/export-pdf-employeeTypes' 
-    : '/panel/reports/export-excel-employeeTypes'
+    ? '/panel/reports/export-pdf-movements' 
+    : '/panel/reports/export-excel-movements'
 
-  const filename = type === 'pdf' ? 'Tipos_empleado.pdf' : 'Tipos_empleado.xlsx'
+  // Nombre de archivo amigable
+  const filename = type === 'pdf' ? 'Movimientos.pdf' : 'Movimientos.xlsx'
 
   try {
     loading.value = true
@@ -101,7 +103,7 @@ const startDownload = async (type: 'pdf' | 'excel') => {
 /* Ajustar tamaño del texto en móviles */
 @media (max-width: 640px) {
   .p-dialog .p-dialog-content p {
-    font-size: 0.875rem; /* texto más pequeño en móviles */
+    font-size: 0.875rem;
   }
 }
 </style>

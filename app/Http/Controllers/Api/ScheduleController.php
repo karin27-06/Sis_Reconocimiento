@@ -82,6 +82,7 @@ class ScheduleController extends Controller
     # EXPORTACION
     public function exportExcel()
     {
+        set_time_limit(0);
         return Excel::download(new ScheduleExport, 'Horarios.xlsx');
     }
 }

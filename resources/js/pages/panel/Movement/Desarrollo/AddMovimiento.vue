@@ -3,6 +3,9 @@
         <template #start>
             <Button label="Nuevo Movimiento" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
         </template>
+            <template #end>
+            <ToolsMovement />       
+        </template>
     </Toolbar>
 
     <Dialog 
@@ -98,6 +101,7 @@ import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
+import ToolsMovement from './toolsMovement.vue';
 
 // Tipos
 interface Movimiento {
