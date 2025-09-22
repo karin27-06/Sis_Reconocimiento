@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\MovementController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SpaceController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Reportes\AlertPDFController;
+use App\Http\Controllers\Reportes\ConfigAlertPDFController;
 use App\Http\Controllers\Reportes\MovementPDFController;
 use App\Http\Controllers\Reportes\SchedulePDFController;
 use App\Http\Controllers\Reportes\SpacePDFController;
@@ -147,37 +149,43 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export-excel-spaces', [SpaceController::class, 'exportExcel'])->name('export-excel-spaces');
         Route::get('/export-pdf-spaces', [SpacePDFController::class, 'exportPDF'])->name('export-pdf-spaces');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-spaces', [SpaceController::class, 'importExcel'])->name('import-excel-spaces');
+        //Route::post('/import-excel-spaces', [SpaceController::class, 'importExcel'])->name('import-excel-spaces');
 
         #EXPORTACION Y IMPORTACION HORARIOS
         Route::get('/export-excel-schedules', [ScheduleController::class, 'exportExcel'])->name('export-excel-schedules');
         Route::get('/export-pdf-schedules', [SchedulePDFController::class, 'exportPDF'])->name('export-pdf-schedules');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-schedules', [ScheduleController::class, 'importExcel'])->name('import-excel-schedules');
+        //Route::post('/import-excel-schedules', [ScheduleController::class, 'importExcel'])->name('import-excel-schedules');
 
         #EXPORTACION Y IMPORTACION TIPOS DE EMPLEADOS
         Route::get('/export-excel-employeeTypes', [EmployeeTypeController::class, 'exportExcel'])->name('export-excel-employeeTypes');
         Route::get('/export-pdf-employeeTypes', [EmployeeTypePDFController::class, 'exportPDF'])->name('export-pdf-employeeTypes');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-employeeTypes', [EmployeeTypeController::class, 'importExcel'])->name('import-excel-employeeTypes');
+        //Route::post('/import-excel-employeeTypes', [EmployeeTypeController::class, 'importExcel'])->name('import-excel-employeeTypes');
 
         #EXPORTACION Y IMPORTACION ALERTAS
         Route::get('/export-excel-alerts', [AlertController::class, 'exportExcel'])->name('export-excel-alerts');
-        //Route::get('/export-pdf-alerts', [AlertPDFController::class, 'exportPDF'])->name('export-pdf-alerts');
+        Route::get('/export-pdf-alerts', [AlertPDFController::class, 'exportPDF'])->name('export-pdf-alerts');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-alerts', [AlertController::class, 'importExcel'])->name('import-excel-alerts');
+        //Route::post('/import-excel-alerts', [AlertController::class, 'importExcel'])->name('import-excel-alerts');
 
         #EXPORTACION Y IMPORTACION MOVIMIENTOS
         Route::get('/export-excel-movements', [MovementController::class, 'exportExcel'])->name('export-excel-movements');
         Route::get('/export-pdf-movements', [MovementPDFController::class, 'exportPDF'])->name('export-pdf-movements');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-movements', [MovementController::class, 'importExcel'])->name('import-excel-movements');
+        //Route::post('/import-excel-movements', [MovementController::class, 'importExcel'])->name('import-excel-movements');
 
         #EXPORTACION Y IMPORTACION EMPLEADOS
         Route::get('/export-excel-employees', [EmployeeController::class, 'exportExcel'])->name('export-excel-employees');
         Route::get('/export-pdf-employees', [EmployeePDFController::class, 'exportPDF'])->name('export-pdf-employees');
         // Ruta para importar desde Excel
-        Route::post('/import-excel-employees', [EmployeeController::class, 'importExcel'])->name('import-excel-employees');
+        //Route::post('/import-excel-employees', [EmployeeController::class, 'importExcel'])->name('import-excel-employees');
+
+        #EXPORTACION Y IMPORTACION CONFIGURACION DE ALERTAS
+        Route::get('/export-excel-config_alerts', [ConfigAlertController::class, 'exportExcel'])->name('export-excel-config_alerts');
+        Route::get('/export-pdf-config_alerts', [ConfigAlertPDFController::class, 'exportPDF'])->name('export-pdf-config_alerts');
+        // Ruta para importar desde Excel
+        //Route::post('/import-excel-config_alerts', [AlertController::class, 'importExcel'])->name('import-excel-config_alerts');
     });
 });
             //RUTAS PARA QUE PASEN EL TEST

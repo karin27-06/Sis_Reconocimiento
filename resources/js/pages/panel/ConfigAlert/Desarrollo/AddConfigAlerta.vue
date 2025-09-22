@@ -7,6 +7,7 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 //import Textarea from 'primevue/textarea';
 import { useToast } from 'primevue/usetoast';
+import ToolsConfigAlert from './toolsConfigAlert.vue';
 
 // Interfaces
 
@@ -100,7 +101,7 @@ async function guardarConfigAlerta() {
         <Button label="Nueva configuración" icon="pi pi-plus" severity="secondary" class="mr-2" @click="openNew" />
     </template>
     <template #end>
-        <!-- aquí puedes añadir herramientas si lo necesitas -->
+        <ToolsConfigAlert />
     </template>
 </Toolbar>
 
