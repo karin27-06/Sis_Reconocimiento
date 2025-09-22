@@ -9,6 +9,6 @@ class ConfigAlertSeeder extends Seeder
 {
     public function run(): void
     {
-        ConfigAlert::factory(1000)->create();
+        
     }
 }
