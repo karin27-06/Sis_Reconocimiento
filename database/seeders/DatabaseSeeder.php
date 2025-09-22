@@ -16,10 +16,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             EmployeeTypeSeeder::class,
-            //development
             SpaceSeeder::class,
-            ConfigAlertSeeder::class,
-            //development
+
         ]);
     }
 }

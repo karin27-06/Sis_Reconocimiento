@@ -220,7 +220,7 @@ class VerificarAccesoController extends Controller
                         'updated_at'    => Carbon::now(),
                     ]);
                 }
-            }
+            }                                          
         } catch (Exception $e) {
             return response()->json([
                 'error' => '❌ Error interno al procesar la solicitud',
