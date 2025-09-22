@@ -140,7 +140,6 @@ class VerificarAccesoController extends Controller
                 } else {
                     $respuesta['mensaje'] = "⚠️ ESP32 reportó codigo_error=$codigoError o no envió foto";
                 }
-
             } elseif ($idTipo === 2) {
                 // Procesar huella
                 $respuesta['mensaje'] = '👆 Recibida huella para verificación';
@@ -193,7 +192,7 @@ class VerificarAccesoController extends Controller
                 ], 400);
             }
 
-            
+
             // ✅ REGISTRAR MOVIMIENTO DESPUÉS DE PROCESAR
             DB::table('movimientos')->insert([
                 'idEspacio'          => $idEspacio,
@@ -203,11 +202,25 @@ class VerificarAccesoController extends Controller
                 'error'              => $codigoError ?: null,
                 'fechaEnvioESP32'    => $fechaEnvioESP32 ?: null,
                 'fechaRecepcion'     => $fechaRecepcion,
-                'fechaReconocimiento'=> $respuesta['fechaReconocimiento'] ?? null,
+                'fechaReconocimiento' => $respuesta['fechaReconocimiento'] ?? null,
                 'created_at'         => Carbon::now(),
                 'updated_at'         => Carbon::now(),
             ]);
 
+            $idMovimiento = DB::getPdo()->lastInsertId(); 
+
+            if (($respuesta['reconocido'] ?? 0) === 1 && ($respuesta['acceso'] ?? 0) === 1) {
+                $empleadoId = $empleadoReconocido->id ?? ($empleado->id ?? null);
+
+                if ($empleadoId) {
+                    DB::table('EmployeeMovement')->insert([
+                        'idMovimiento' => $idMovimiento,
+                        'idEmpleado'   => $empleadoId,
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now(),
+                    ]);
+                }
+            }
         } catch (Exception $e) {
             return response()->json([
                 'error' => '❌ Error interno al procesar la solicitud',
