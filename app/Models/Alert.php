@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Alert extends Model
 {
@@ -13,22 +12,24 @@ class Alert extends Model
     protected $table = 'alerts';
 
     protected $fillable = [
-        'idMovimiento',
+        'idMovimientos',  // 👈 ahora es JSON
         'descripcion',
         'fecha',
         'tipo',
     ];
 
     protected $casts = [
-        'fecha' => 'date', // Para manejarlo como instancia de Carbon
+        'idMovimientos' => 'array', // 👈 se convierte automáticamente en array
+        'fecha' => 'date',
         'tipo' => 'integer',
     ];
 
     /**
-     * Relación con el movimiento
+     * Relación con los movimientos.
+     * Devuelve una colección de Movement según los IDs guardados en idMovimientos.
      */
-    public function movimiento(): BelongsTo
+    public function movimientos()
     {
-        return $this->belongsTo(Movement::class, 'idMovimiento', 'id');
+        return Movement::whereIn('id', $this->idMovimientos)->get();
     }
 }
