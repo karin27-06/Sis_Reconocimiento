@@ -238,29 +238,30 @@ if (($respuesta['reconocido'] ?? 0) === 0) {
     $intentosFallidos = count($movimientosFallidos);
 
     if ($intentosFallidos >= 5) {
-        // Ordenar IDs para que siempre se compare igual
-        sort($movimientosFallidos);
-        $jsonIds = json_encode($movimientosFallidos);
+   // Ordenar y json_encode para comparar
+sort($movimientosFallidos);
+$jsonIds = json_encode($movimientosFallidos);
 
-        // Revisar si ya existe una alerta con EXACTAMENTE esos movimientos
-        $alertaExistente = DB::table('alerts')
-            ->where('descripcion', 'like', '%intentos fallidos%')
-            ->where('idMovimientos', $jsonIds) // 👈 asumimos que guardaremos como JSON en la BD
-            ->exists();
+// Revisar si ya existe alerta con esos movimientos exactos
+$alertaExistente = DB::table('alerts')
+    ->where('descripcion', 'like', '%intentos fallidos%')
+    ->where('idMovimientos', $jsonIds)
+    ->exists();
 
-        if (!$alertaExistente) {
-            DB::table('alerts')->insert([
-                'idMovimientos' => $jsonIds, // 👈 nueva columna tipo TEXT/JSON en alerts
-                'descripcion'   => "Se detectaron $intentosFallidos intentos fallidos de acceso en los últimos 30 minutos.",
-                'fecha'         => Carbon::now()->toDateString(),
-                'tipo'          => $idTipo, // 1 = Foto, 2 = Huella
-                'created_at'    => Carbon::now(),
-                'updated_at'    => Carbon::now(),
-            ]);
+if (!$alertaExistente) {
+    DB::table('alerts')->insert([
+        'idMovimientos' => $jsonIds, // 👈 guardar como JSON string
+        'descripcion'   => "Se detectaron $intentosFallidos intentos fallidos de acceso en los últimos 30 minutos.",
+        'fecha'         => Carbon::now()->toDateString(),
+        'tipo'          => $idTipo,
+        'created_at'    => Carbon::now(),
+        'updated_at'    => Carbon::now(),
+    ]);
 
-            $respuesta['alerta_generada'] = true;
-            $respuesta['movimientos_alerta'] = $movimientosFallidos;
-        } else {
+
+    $respuesta['alerta_generada'] = true;
+    $respuesta['movimientos_alerta'] = $movimientosFallidos;
+}else {
             $respuesta['alerta_generada'] = false;
             $respuesta['mensaje'] = 'Ya existe una alerta con esos intentos.';
         }
