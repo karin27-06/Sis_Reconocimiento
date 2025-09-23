@@ -220,7 +220,10 @@ class VerificarAccesoController extends Controller
                         'updated_at'    => Carbon::now(),
                     ]);
                 }
-            }                                          
+            }    
+            $respuesta['idMovimiento'] = $idMovimiento;
+            $respuesta['idEmpleado']   = $empleadoId;
+            $respuesta['relacionGuardada'] = true;                                      
         } catch (Exception $e) {
             return response()->json([
                 'error' => '❌ Error interno al procesar la solicitud',
