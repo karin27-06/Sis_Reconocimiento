@@ -249,8 +249,9 @@ $alertaExistente = DB::table('alerts')
     ->exists();
 
 if (!$alertaExistente) {
+    try {
     DB::table('alerts')->insert([
-        'idMovimientos' => $jsonIds, // 👈 guardar como JSON string
+        'idMovimientos' => $jsonIds,
         'descripcion'   => "Se detectaron $intentosFallidos intentos fallidos de acceso en los últimos 30 minutos.",
         'fecha'         => Carbon::now()->toDateString(),
         'tipo'          => $idTipo,
@@ -258,9 +259,13 @@ if (!$alertaExistente) {
         'updated_at'    => Carbon::now(),
     ]);
 
-
     $respuesta['alerta_generada'] = true;
     $respuesta['movimientos_alerta'] = $movimientosFallidos;
+} catch (Exception $ex) {
+    $respuesta['alerta_generada'] = false;
+    $respuesta['error_insert_alert'] = $ex->getMessage();
+}
+
 }else {
             $respuesta['alerta_generada'] = false;
             $respuesta['mensaje'] = 'Ya existe una alerta con esos intentos.';

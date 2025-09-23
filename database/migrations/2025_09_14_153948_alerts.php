@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             // 🔥 En lugar de 1 solo idMovimiento, ahora un JSON con varios IDs
-            $table->json('idMovimientos'); // array de idMovimiento
+$table->json('idMovimientos')->nullable();
 
             // Otros campos
             $table->string('descripcion')->nullable(); // No es obligatoria
