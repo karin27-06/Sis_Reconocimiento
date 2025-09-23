@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('alerts', function (Blueprint $table) {
             $table->id();
 
-            // Relación con movimientos
-            $table->foreignId('idMovimiento')
-                  ->constrained('movimientos', 'id');
+            // 🔥 En lugar de 1 solo idMovimiento, ahora un JSON con varios IDs
+$table->json('idMovimientos')->nullable();
 
             // Otros campos
             $table->string('descripcion')->nullable(); // No es obligatoria

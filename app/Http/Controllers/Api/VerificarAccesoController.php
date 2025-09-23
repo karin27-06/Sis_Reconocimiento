@@ -220,7 +220,63 @@ class VerificarAccesoController extends Controller
                         'updated_at'    => Carbon::now(),
                     ]);
                 }
-            }                                          
+            }    
+            $respuesta['idMovimiento'] = $idMovimiento;
+            $respuesta['idEmpleado']   = $empleadoId;
+            $respuesta['relacionGuardada'] = true;    
+            
+            
+// 🚨 CONDICIONAL: 5 intentos fallidos en 30 minutos => crear alerta
+if (($respuesta['reconocido'] ?? 0) === 0) {
+    // Traer todos los movimientos fallidos últimos 30 min
+    $movimientosFallidos = DB::table('movimientos')
+        ->where('reconocido', 0)
+        ->where('created_at', '>=', Carbon::now()->subMinutes(30))
+        ->pluck('id')
+        ->toArray();
+
+    $intentosFallidos = count($movimientosFallidos);
+
+    if ($intentosFallidos >= 5) {
+   // Ordenar y json_encode para comparar
+sort($movimientosFallidos);
+$jsonIds = json_encode($movimientosFallidos);
+
+// Revisar si ya existe alerta con esos movimientos exactos
+$alertaExistente = DB::table('alerts')
+    ->where('descripcion', 'like', '%intentos fallidos%')
+    ->where('idMovimientos', $jsonIds)
+    ->exists();
+
+if (!$alertaExistente) {
+    try {
+    DB::table('alerts')->insert([
+        'idMovimientos' => $jsonIds,
+        'descripcion'   => "Se detectaron $intentosFallidos intentos fallidos de acceso en los últimos 30 minutos.",
+        'fecha'         => Carbon::now()->toDateString(),
+        'tipo'          => $idTipo,
+        'created_at'    => Carbon::now(),
+        'updated_at'    => Carbon::now(),
+    ]);
+
+    $respuesta['alerta_generada'] = true;
+    $respuesta['movimientos_alerta'] = $movimientosFallidos;
+} catch (Exception $ex) {
+    $respuesta['alerta_generada'] = false;
+    $respuesta['error_insert_alert'] = $ex->getMessage();
+}
+
+}else {
+            $respuesta['alerta_generada'] = false;
+            $respuesta['mensaje'] = 'Ya existe una alerta con esos intentos.';
+        }
+    } else {
+        $respuesta['alerta_generada'] = false;
+    }
+}
+
+
+
         } catch (Exception $e) {
             return response()->json([
                 'error' => '❌ Error interno al procesar la solicitud',
