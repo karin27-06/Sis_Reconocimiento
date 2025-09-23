@@ -31,7 +31,7 @@
     </Dialog>
 
     <!-- Toast -->
-    <Toast ref="toast" />
+    <Toast />
   </div>
 </template>
 <script setup lang="ts">
