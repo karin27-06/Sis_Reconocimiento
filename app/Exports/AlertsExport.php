@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Alert;
+use App\Models\Movement;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -19,9 +20,14 @@ class AlertsExport implements FromCollection, WithHeadings, WithMapping, WithSty
 
     public function map($alert): array
     {
+        // 🔥 Obtener los IDs de movimientos como string
+        $movimientos = is_array($alert->idMovimientos) 
+            ? implode(', ', $alert->idMovimientos) 
+            : 'Sin movimientos';
+
         return [
             $alert->id,
-            $alert->movimiento ? $alert->movimiento->id : 'Sin movimiento',
+            $movimientos, // 👈 ahora muestra todos los IDs
             $alert->descripcion,
             $alert->fecha ? Carbon::parse($alert->fecha)->format('d-m-Y') : null,
             $alert->tipo == 1 ? 'Huella' : ($alert->tipo == 2 ? 'Cara' : 'Desconocido'),
@@ -35,7 +41,7 @@ class AlertsExport implements FromCollection, WithHeadings, WithMapping, WithSty
         return [
             ['LISTA DE ALERTAS', '', '', '', '', '', ''], // Título
             [], // Fila en blanco
-            ['ID', 'Movimiento', 'Descripción', 'Fecha', 'Tipo', 'Creación', 'Actualización'], // Encabezados
+            ['ID', 'Movimientos', 'Descripción', 'Fecha', 'Tipo', 'Creación', 'Actualización'], // Encabezados
         ];
     }
 

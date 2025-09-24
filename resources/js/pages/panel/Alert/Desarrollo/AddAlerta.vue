@@ -18,22 +18,24 @@
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
 
-                <!-- Movimiento relacionado -->
-                <div class="col-span-12">
-                    <label class="block font-bold mb-2">Movimiento <span class="text-red-500">*</span></label>
-                    <Dropdown
-                        v-model="alerta.idMovimiento"
-                        :options="movimientos"
-                        optionLabel="name"
-                        optionValue="id"
-                        placeholder="Seleccione un movimiento"
-                        class="w-full"
-                        filter
-                        filterPlaceholder="Buscar movimiento"
-                    />
-                    <small v-if="submitted && !alerta.idMovimiento" class="text-red-500">Debe seleccionar un movimiento.</small>
-                    <small v-if="serverErrors.idMovimiento" class="text-red-500">{{ serverErrors.idMovimiento[0] }}</small>
-                </div>
+                <!-- Movimientos relacionados -->
+            <div class="col-span-12">
+                <label class="block font-bold mb-2">Movimientos <span class="text-red-500">*</span></label>
+                <MultiSelect
+                    v-model="alerta.idMovimientos"
+                    :options="movimientos"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Seleccione movimientos"
+                    class="w-full"
+                    filter
+                    display="chip"
+                />
+                <small v-if="submitted && alerta.idMovimientos.length === 0" class="text-red-500">
+                    Debe seleccionar al menos un movimiento.
+                </small>
+                <small v-if="serverErrors.idMovimientos" class="text-red-500">{{ serverErrors.idMovimientos[0] }}</small>
+            </div>
 
                 <!-- Descripción -->
                 <div class="col-span-12">
@@ -59,8 +61,9 @@
 
                 <!-- Fecha -->
                 <div class="col-span-12">
-                    <label class="block font-bold mb-2">Fecha</label>
+                    <label class="block font-bold mb-2">Fecha <span class="text-red-500">*</span></label>
                     <InputText type="date" v-model="alerta.fecha" class="w-full"/>
+                    <small v-if="submitted && !alerta.fecha" class="text-red-500">La fecha es obligatoria.</small>
                     <small v-if="serverErrors.fecha" class="text-red-500">{{ serverErrors.fecha[0] }}</small>
                 </div>
 
@@ -84,10 +87,11 @@ import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
 import ToolsAlert from './toolsAlert.vue';
+import MultiSelect from 'primevue/multiselect';
 
 // Tipos
 interface Alerta {
-    idMovimiento: number | null;
+    idMovimientos: number[];  // 👈 ahora es un array
     descripcion: string;
     tipo: number | null;
     fecha: string;
@@ -113,7 +117,7 @@ const emit = defineEmits<{
 }>();
 
 const alerta = ref<Alerta>({
-    idMovimiento: null,
+    idMovimientos: [],
     descripcion: '',
     tipo: null,
     fecha: ''
@@ -135,7 +139,7 @@ function hideDialog() {
 // Reset
 function resetAlerta() {
     alerta.value = {
-        idMovimiento: null,
+        idMovimientos: [],
         descripcion: '',
         tipo: null,
         fecha: ''
@@ -146,12 +150,10 @@ function resetAlerta() {
 
 // Cargar movimientos
 function fetchMovimientos() {
-    axios.get<{ data: Movimiento[] }>('/movimiento', { params: { state: 1 } })
+    axios.get<{ data: any[] }>('/movimiento', { params: { state: 1 } })
         .then(res => {
-            // Mapeamos los datos para crear un "name" legible
             movimientos.value = res.data.data.map(mov => ({
-                id: mov.id,
-                name: `ID: ${mov.id}`
+                id: mov.id, name: `ID: ${mov.id}`
             }));
         })
         .catch(() => {
@@ -164,8 +166,8 @@ function guardarAlerta() {
     submitted.value = true;
     serverErrors.value = {};
 
-    if (!alerta.value.idMovimiento || !alerta.value.tipo) return;
-
+    if (alerta.value.idMovimientos.length === 0 || !alerta.value.tipo || !alerta.value.fecha) return;
+    console.log('Payload enviado:', alerta.value);
     axios.post('/alerta', alerta.value)
         .then(() => {
             toast.add({ severity: 'success', summary: 'Éxito', detail: 'Alerta registrada', life: 3000 });

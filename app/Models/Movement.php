@@ -32,12 +32,8 @@ class Movement extends Model
     {
         return $this->belongsTo(Space::class, 'idEspacio', 'id');
     }
-    public function Alerts(): HasMany {
-        return $this->hasMany(Alert::class, 'idMovimiento', 'id');
-    }
     public function tieneRelaciones(): bool
     {
-        //se agrega todas las relaciones que existan
-        return $this->Alerts()->exists();
+        return Alert::whereJsonContains('idMovimientos', $this->id)->exists();
     }
 }

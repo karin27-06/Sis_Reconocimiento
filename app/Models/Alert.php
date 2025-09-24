@@ -30,6 +30,9 @@ class Alert extends Model
      */
     public function movimientos()
     {
+        if (empty($this->idMovimientos)) {
+        return collect();
+    }
         return Movement::whereIn('id', $this->idMovimientos)->get();
     }
 }
