@@ -22,7 +22,7 @@ class FilterByAlert
             $builder->where(function ($q) use ($searchLower) {
                 $q
                     // Buscar por idMovimiento (parcial)
-                    ->orWhere('idMovimiento', 'like', '%' . $searchLower . '%')
+                    ->orWhere('idMovimientos', 'like', '%' . $searchLower . '%')
                     // Buscar por descripcion (parcial, case-insensitive)
                     ->orWhereRaw('LOWER(descripcion) LIKE ?', ['%' . $searchLower . '%']);
             });

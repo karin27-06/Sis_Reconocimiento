@@ -11,19 +11,20 @@ class AlertPDFController extends Controller
 {
     public function exportPDF()
     {
-        // Obtener los datos de alertas con su relación
+        // Obtener las alertas con sus movimientos
         $alerts = Alert::orderBy('id', 'asc')->get();
 
-        // Convertirlos en array con formato
+        // Convertir a array con formato
         $alertsArray = $alerts->map(function ($alert) {
             return [
-                'id' => $alert->id,
-                'movimiento' => $alert->movimiento ? $alert->movimiento->id : 'Sin movimiento',
+                'id'          => $alert->id,
+                // 🔥 ahora puede tener varios movimientos
+                'movimientos' => $alert->movimientos()->pluck('id')->implode(', ') ?: 'Sin movimientos',
                 'descripcion' => $alert->descripcion,
-                'fecha' => $alert->fecha ? Carbon::parse($alert->fecha)->format('d-m-Y') : null,
-                'tipo' => $alert->tipo == 1 ? 'Huella' : ($alert->tipo == 2 ? 'Cara' : 'Desconocido'),
-                'created_at'=>$alert->created_at,
-                'updated_at' => $alert->updated_at,
+                'fecha'       => $alert->fecha ? Carbon::parse($alert->fecha)->format('d-m-Y') : null,
+                'tipo'        => $alert->tipo == 1 ? 'Huella' : ($alert->tipo == 2 ? 'Cara' : 'Desconocido'),
+                'created_at'  => Carbon::parse($alert->created_at)->format('d-m-Y H:i:s A'),
+                'updated_at'  => Carbon::parse($alert->updated_at)->format('d-m-Y H:i:s A'),
             ];
         })->toArray();
 
@@ -56,8 +57,8 @@ class AlertPDFController extends Controller
         $pdf->SetFont('helvetica', 'B', 10);
         $pdf->SetFillColor(242, 242, 242);
 
-        $header = ['ID', 'Movimiento', 'Descripción', 'Fecha', 'Tipo', 'Creación', 'Actualización'];
-        $widths = [7, 23, 60, 20, 20, 30, 30]; // Ajustados para 8 columnas
+        $header = ['ID', 'Movimientos', 'Descripción', 'Fecha', 'Tipo', 'Creación', 'Actualización'];
+        $widths = [7, 26, 55, 20, 16, 34, 34]; // ajustado para que quepa "movimientos"
 
         // Dibujar encabezados
         foreach ($header as $i => $col) {
@@ -72,7 +73,7 @@ class AlertPDFController extends Controller
             // Si se llega al final de la página -> nueva página y repetir encabezados
             if ($pdf->GetY() > 250) {
                 $pdf->AddPage();
-                $pdf->SetFont('helvetica', 'B', 9);
+                $pdf->SetFont('helvetica', 'B', 10);
                 $pdf->SetFillColor(242, 242, 242);
                 foreach ($header as $i => $col) {
                     $pdf->MultiCell($widths[$i], 8, $col, 1, 'C', 1, 0);
@@ -83,7 +84,7 @@ class AlertPDFController extends Controller
             // Datos
             $pdf->SetFont('helvetica', '', 8);
             $pdf->MultiCell($widths[0], 8, $alert['id'], 1, 'C', 0, 0);
-            $pdf->MultiCell($widths[1], 8, $alert['movimiento'], 1, 'C', 0, 0);
+            $pdf->MultiCell($widths[1], 8, $alert['movimientos'], 1, 'C', 0, 0);
             $pdf->MultiCell($widths[2], 8, $alert['descripcion'], 1, 'L', 0, 0); // Descripción alineada a la izquierda
             $pdf->MultiCell($widths[3], 8, $alert['fecha'], 1, 'C', 0, 0);
             $pdf->MultiCell($widths[4], 8, $alert['tipo'], 1, 'C', 0, 0);
@@ -92,7 +93,6 @@ class AlertPDFController extends Controller
             $pdf->Ln();
         }
 
-        // Limpiar buffer
         if (ob_get_length()) {
             ob_end_clean();
         }

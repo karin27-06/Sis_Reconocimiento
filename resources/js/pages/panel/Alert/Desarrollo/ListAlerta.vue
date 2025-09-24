@@ -14,12 +14,20 @@ import DeleteAlerta from './DeleteAlerta.vue';
 import UpdateAlerta from './UpdateAlerta.vue';
 import { useToast } from 'primevue/usetoast';
 import Calendar from 'primevue/calendar';
+import ViewAlerta from './ViewAlerta.vue';
 
+const viewAlertaMovementDialog = ref(false);
+const selectedIdMovimientos = ref<number[]>([]);
+
+function viewAlertaMovimientos(alerta: any) {
+    selectedIdMovimientos.value= alerta.idMovimientos;
+    viewAlertaMovementDialog.value = true;
+}
 
 // Tipos
 interface Alerta {
     id: number;
-    idMovimiento: number;
+    idMovimientos: number[];
     Movimiento: string | number | null;
     descripcion: string | null;
     fecha: string;
@@ -45,7 +53,7 @@ const toast = useToast();
 const dt = ref<any>(null);
 const alertas = ref<Alerta[]>([]);
 const selectedAlertas = ref<Alerta[]>([]);
-const selectedDate = ref<string | null>(null);
+const selectedDate = ref<Date | null>(null);
 const loading = ref(false);
 const globalFilterValue = ref('');
 const deleteAlertaDialog = ref(false);
@@ -110,7 +118,7 @@ const loadAlertas = async (): Promise<void> => {
             per_page: pagination.value.perPage,
             search: globalFilterValue.value,
             tipo: selectedTipo.value ?? '',
-            fecha: selectedDate.value ?? '' // 🔥 enviamos la fecha al backend
+            fecha: selectedDate.value ? selectedDate.value.toISOString().slice(0, 10) : '' // 🔥 enviamos la fecha al backend en formato yyyy-mm-dd
         };
         const response = await axios.get('/alerta', { params });
         alertas.value = response.data.data;
@@ -194,7 +202,7 @@ onMounted(() => {
                     <InputText 
                         v-model="globalFilterValue" 
                         @input="onGlobalSearch" 
-                        placeholder="Buscar por id movimiento o descripcion..." 
+                        placeholder="Buscar por movimientos o descripción..." 
                         class="w-full md:w-80"
                     />
                 </IconField>
@@ -219,7 +227,14 @@ onMounted(() => {
 </template>
 
     <Column selectionMode="multiple" style="width: 1rem" />
-    <Column field="idMovimiento" header="ID Movimiento" sortable style="min-width: 8rem" />
+    <Column header="Movimientos" style="min-width: 10rem">
+    <template #body="{ data }">
+            <span v-if="Array.isArray(data.idMovimientos)">
+                {{ data.idMovimientos.join(', ') }}
+            </span>
+            <span v-else>-</span>
+        </template>
+    </Column>
     <Column field="descripcion" header="Descripción" sortable style="min-width: 12rem" />
     <Column field="fecha" header="Fecha" sortable style="min-width: 10rem" />
     <Column field="tipoTexto" header="Tipo" sortable style="min-width: 8rem">
@@ -229,14 +244,18 @@ onMounted(() => {
     </Column>
     <Column field="creacion" header="Creación" sortable style="min-width: 13rem" />
     <Column field="actualizacion" header="Actualización" sortable style="min-width: 13rem" />
-    <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 8rem">
+    <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 10rem">
         <template #body="{ data }">
+            <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="viewAlertaMovimientos(data)" />
             <Button icon="pi pi-pencil" outlined rounded class="mr-2 mb-2 md:mb-0" @click="editAlerta(data)" />
             <Button icon="pi pi-trash" outlined rounded severity="danger" class="mb-2 md:mb-0" @click="confirmDeleteAlerta(data)" />
         </template>
-    </Column>
+        </Column>
 </DataTable>
-
+<ViewAlerta
+  v-model:visible="viewAlertaMovementDialog"
+  :idMovimientos="selectedIdMovimientos"
+/>
 <DeleteAlerta 
     v-model:visible="deleteAlertaDialog" 
     :alerta="alerta" 

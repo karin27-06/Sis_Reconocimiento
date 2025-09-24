@@ -9,6 +9,22 @@
         <div class="flex flex-col gap-6">
             <div class="grid grid-cols-12 gap-4">
 
+                <!-- Movimiento relacionado -->
+                <div class="col-span-12">
+                    <label class="block font-bold mb-2">Movimiento relacionado</label>
+                    <MultiSelect
+                        v-model="alerta.idMovimientos"
+                        :options="movimientos"
+                        optionLabel="id"
+                        optionValue="id"
+                        placeholder="Seleccione movimientos"
+                        class="w-full"
+                        display="chip"
+                        :class="{ 'p-invalid': serverErrors.idMovimientos }"
+                    />
+                    <small v-if="serverErrors.idMovimientos" class="text-red-500">{{ serverErrors.idMovimientos[0] }}</small>
+                </div>
+
                 <!-- Descripción -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Descripción <span class="text-red-500">*</span></label>
@@ -50,21 +66,6 @@
                     <small v-if="serverErrors.fecha" class="text-red-500">{{ serverErrors.fecha[0] }}</small>
                 </div>
 
-                <!-- Movimiento relacionado -->
-                <div class="col-span-12">
-                    <label class="block font-bold mb-2">Movimiento relacionado</label>
-                    <Dropdown
-                        v-model="alerta.idMovimiento"
-                        :options="movimientos"
-                        optionLabel="id"
-                        optionValue="id"
-                        placeholder="Seleccione un movimiento"
-                        class="w-full"
-                        :class="{ 'p-invalid': serverErrors.idMovimiento }"
-                    />
-                    <small v-if="serverErrors.idMovimiento" class="text-red-500">{{ serverErrors.idMovimiento[0] }}</small>
-                </div>
-
             </div>
         </div>
 
@@ -83,10 +84,11 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
+import MultiSelect from 'primevue/multiselect';
 
 // Tipos
 interface Alerta {
-    idMovimiento: number | null;
+    idMovimientos: number[];   // ✅ array de IDs
     descripcion: string;
     tipo: number | null;
     fecha: string;
@@ -119,7 +121,7 @@ const submitted = ref<boolean>(false);
 const serverErrors = ref<ServerErrors>({});
 const movimientos = ref<Movimiento[]>([]);
 const alerta = ref<Alerta>({
-    idMovimiento: null,
+    idMovimientos: [],
     descripcion: '',
     tipo: null,
     fecha: ''
@@ -165,7 +167,7 @@ const fetchAlerta = async (): Promise<void> => {
         }
 
         alerta.value = {
-            idMovimiento: data.idMovimiento ?? null,
+            idMovimientos: Array.isArray(data.idMovimientos) ? data.idMovimientos : [],
             descripcion: data.descripcion ?? '',
             tipo: data.tipo ?? null,
             fecha: fechaISO
