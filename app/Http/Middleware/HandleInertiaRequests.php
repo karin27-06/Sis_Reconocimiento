@@ -40,7 +40,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => ['message' => "contros de prestamos", 'author' => "2025 0K"],
+            'quote' => ['message' => "Bienvenidos al sistema de reconocimiento", 'author' => "Pablo y Karin"],
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,
