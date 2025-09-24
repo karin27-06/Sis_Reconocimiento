@@ -20,7 +20,7 @@ $table->json('idMovimientos')->nullable();
             // Otros campos
             $table->string('descripcion')->nullable(); // No es obligatoria
             $table->date('fecha'); // Solo la fecha
-            $table->tinyInteger('tipo')->comment('2: Huella, 1: Cara');
+            $table->tinyInteger('tipo')->comment('1: Huella, 2: Cara');
 
             $table->timestamps(); // created_at y updated_at
         });
