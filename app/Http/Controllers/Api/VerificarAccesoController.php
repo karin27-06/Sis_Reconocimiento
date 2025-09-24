@@ -113,6 +113,7 @@ class VerificarAccesoController extends Controller
 
                     if ($empleadoReconocido) {
                         $respuesta['reconocido'] = 1;
+                        $empleadoId= $empleadoReconocido->id ?? '';
                         $respuesta['nombre'] = $empleadoReconocido->name;
                         $respuesta['apellido'] = $empleadoReconocido->apellido;
 
@@ -157,6 +158,7 @@ class VerificarAccesoController extends Controller
 
                     if ($empleado) {
                         $respuesta['reconocido'] = 1;
+                        $empleadoId= $empleado->id ?? '';
                         $respuesta['nombre'] = $empleado->name ?? '';
                         $respuesta['apellido'] = $empleado->apellido ?? '';
 
@@ -224,6 +226,7 @@ class VerificarAccesoController extends Controller
             $respuesta['idMovimiento'] = $idMovimiento;
             $respuesta['idEmpleado']   = $empleadoId;
             $respuesta['relacionGuardada'] = true;    
+
             if (($respuesta['acceso'] ?? 1) === 0) {
     $fallidos = DB::table('movimientos')
         ->where('access', 0)
