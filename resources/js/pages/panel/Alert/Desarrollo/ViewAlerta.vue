@@ -31,8 +31,11 @@
             <Tag :value="data.access ? 'Si' : 'No'" :severity="data.access ? 'success' : 'danger'" />
           </template>
         </Column>
-        <Column field="error" header="Error" style="width: 10%" />
-        <Column field="fechaEnvioESP32" header="Envío ESP32" style="width: 15%" />
+    <Column field="error" header="Error" sortable style="width: 10%">
+        <template #body="{ data }">
+            {{ data.error && data.error != 0 ? data.error : 'Ninguno' }}
+        </template>
+    </Column>        <Column field="fechaEnvioESP32" header="Envío ESP32" style="width: 15%" />
         <Column field="fechaRecepcion" header="Recepción" style="width: 15%" />
         <Column field="fechaReconocimiento" header="Reconocimiento" style="width: 15%" />
       </DataTable>
