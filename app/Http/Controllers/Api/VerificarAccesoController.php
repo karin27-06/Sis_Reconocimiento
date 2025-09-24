@@ -227,12 +227,25 @@ $respuesta['idMovimiento'] = $idMovimiento;
 $respuesta['idEmpleado']   = $empleadoId ?? null;
 $respuesta['relacionGuardada'] = isset($empleadoId);
 
-            if (($respuesta['acceso'] ?? 1) === 0) {
+if (($respuesta['acceso'] ?? 1) === 0) {
+    // movimientos fallidos últimos 30 minutos
     $fallidos = DB::table('movimientos')
         ->where('access', 0)
         ->where('created_at', '>=', Carbon::now()->subMinutes(30))
         ->pluck('id')
         ->toArray();
+
+    // ids ya utilizados en alertas previas
+    $usadosEnAlertas = DB::table('alerts')
+        ->pluck('idMovimientos')
+        ->map(function ($json) {
+            return json_decode($json, true) ?: [];
+        })
+        ->flatten()
+        ->toArray();
+
+    // excluir movimientos ya alertados
+    $fallidos = array_values(array_diff($fallidos, $usadosEnAlertas));
 
     if (count($fallidos) >= 3) {
         DB::table('alerts')->insert([
@@ -244,7 +257,7 @@ $respuesta['relacionGuardada'] = isset($empleadoId);
             'updated_at'    => Carbon::now(),
         ]);
 
-        $respuesta['alerta_generada'] = true;
+        $respuesta['alerta_generada']   = true;
         $respuesta['movimientos_alerta'] = $fallidos;
     } else {
         $respuesta['alerta_generada'] = false;
