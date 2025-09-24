@@ -13,7 +13,7 @@ class VerificarAccesoController extends Controller
     public function verificar(Request $request)
     {
         date_default_timezone_set('America/Lima');
-
+$empleadoId = null;
         $codigosErrores = [
             0   => 'Sin error',
             101 => 'Error al tomar la foto en ESP32',
@@ -113,7 +113,7 @@ class VerificarAccesoController extends Controller
 
                     if ($empleadoReconocido) {
                         $respuesta['reconocido'] = 1;
-                        $empleadoId= $empleadoReconocido->id ?? '';
+                        $empleadoId= $empleado->id ?? '';
                         $respuesta['nombre'] = $empleadoReconocido->name;
                         $respuesta['apellido'] = $empleadoReconocido->apellido;
 
@@ -223,9 +223,9 @@ class VerificarAccesoController extends Controller
                     ]);
                 }
             }    
-            $respuesta['idMovimiento'] = $idMovimiento;
-            $respuesta['idEmpleado']   = $empleadoId;
-            $respuesta['relacionGuardada'] = true;    
+$respuesta['idMovimiento'] = $idMovimiento;
+$respuesta['idEmpleado']   = $empleadoId ?? null;
+$respuesta['relacionGuardada'] = isset($empleadoId);
 
             if (($respuesta['acceso'] ?? 1) === 0) {
     $fallidos = DB::table('movimientos')
