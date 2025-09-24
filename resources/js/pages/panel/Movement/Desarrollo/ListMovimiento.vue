@@ -148,10 +148,6 @@ const getSeverity = (value: boolean) => (value ? 'success' : 'danger');
 onMounted(() => {
     loadMovimientos();
 });
-const tipoTemplate = (rowData) => {
-  return rowData.idTipo === 1 ? 'Cara' : rowData.idTipo === 2 ? 'Huella' : 'Desconocido';
-};
-
 </script>
 
 <template>
@@ -209,13 +205,7 @@ const tipoTemplate = (rowData) => {
 
     <Column selectionMode="multiple" style="width: 1rem" />
     <Column field="Espacio" header="Espacio" sortable style="min-width: 12rem" />
-<Column 
-  field="idTipo" 
-  header="Tipo" 
-  sortable 
-  style="min-width: 10rem"
-  :body="tipoTemplate" 
-/>
+    <Column field="idTipo" header="Tipo" sortable style="min-width: 10rem" />
     <Column field="reconocido" header="Reconocido" sortable style="min-width: 8rem">
         <template #body="{ data }">
             <Tag :value="data.reconocido ? 'Sí' : 'No'" :severity="getSeverity(data.reconocido)" />
