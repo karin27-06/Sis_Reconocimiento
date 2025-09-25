@@ -252,6 +252,7 @@ if (($respuesta['acceso'] ?? 1) === 0) {
             'idMovimientos' => json_encode($fallidos),
             'descripcion'   => '⚠️ Se detectaron ' . count($fallidos) . ' intentos fallidos en los últimos 30 minutos',
             'fecha'         => Carbon::now()->toDateString(),
+            'tipo'          => $idTipo,
             'created_at'    => Carbon::now(),
             'updated_at'    => Carbon::now(),
         ]);

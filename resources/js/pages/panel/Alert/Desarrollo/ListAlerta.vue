@@ -70,12 +70,6 @@ const pagination = ref<Pagination>({
     total: 0
 });
 
-// Filtros
-const tipoOptions = ref([
-    { name: 'TODOS', value: '' },
-    { name: 'Cara', value: 1 },
-    { name: 'Huella', value: 2 },
-]);
 
 // Watchers
 watch(() => props.refresh, () => loadAlertas());
