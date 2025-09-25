@@ -20,17 +20,23 @@ class AlertsExport implements FromCollection, WithHeadings, WithMapping, WithSty
 
     public function map($alert): array
     {
-        // 🔥 Obtener los IDs de movimientos como string
-        $movimientos = is_array($alert->idMovimientos) 
-            ? implode(', ', $alert->idMovimientos) 
-            : 'Sin movimientos';
+        // 🔥 Obtener los movimientos
+        $movimientos = $alert->movimientos();
+
+        // IDs como string
+        $movimientosIds = $movimientos->pluck('id')->implode(', ') ?: 'Sin movimientos';
+
+        // Tipos como string (ej: "Cara, Huella")
+        $tipos = $movimientos->map(function ($mov) {
+            return $mov->idTipo === 1 ? 'Cara' : 'Huella';
+        })->unique()->implode(', ') ?: 'Sin tipo';
 
         return [
             $alert->id,
-            $movimientos, // 👈 ahora muestra todos los IDs
+            $movimientosIds,
             $alert->descripcion,
             $alert->fecha ? Carbon::parse($alert->fecha)->format('d-m-Y') : null,
-            $alert->tipo == 1 ? 'Huella' : ($alert->tipo == 2 ? 'Cara' : 'Desconocido'),
+            $tipos, // 👈 ahora correcto
             Carbon::parse($alert->created_at)->format('d-m-Y H:i:s A'),
             Carbon::parse($alert->updated_at)->format('d-m-Y H:i:s A'),
         ];

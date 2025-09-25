@@ -18,7 +18,7 @@ import { useToast } from 'primevue/usetoast';
 interface Movimiento {
     id: number;
     Espacio: string;
-    idTipo: string;
+    idTipo: number; // 🔹 ahora es número
     reconocido: boolean | number | string;
     access: boolean | number | string;
     error: string | number;
@@ -57,6 +57,7 @@ const updateMovimientoDialog = ref(false);
 const movimiento = ref<Movimiento | null>(null);
 const selectedMovimientoId = ref<number | null>(null);
 const selectedReconocido = ref<Option | null>(null);
+const selectedTipo = ref<number | null>(null);
 const selectedAccess = ref<Option | null>(null);
 const currentPage = ref(1);
 const pagination = ref<Pagination>({
@@ -64,7 +65,11 @@ const pagination = ref<Pagination>({
     perPage: 15,
     total: 0
 });
-
+const tipoOptions = ref([
+    { name: 'TODOS', value: '' },
+    { name: 'Cara', value: 1 },
+    { name: 'Huella', value: 2 },
+]);
 // Filtros
 const reconocidoOptions = ref<Option[]>([
     { name: 'TODOS', value: '' },
@@ -77,13 +82,19 @@ const accessOptions = ref<Option[]>([
     { name: 'Con Acceso', value: 1 },
     { name: 'Sin Acceso', value: 0 },
 ]);
-
+const tipoMovimientoText = (idTipo: number) => {
+    switch (idTipo) {
+        case 1: return 'Cara';
+        case 2: return 'Huella';
+        default: return 'Desconocido';
+    }
+};
 // Watchers
 watch(() => props.refresh, () => {
     loadMovimientos();
 });
 
-watch([selectedReconocido, selectedAccess], () => {
+watch([selectedReconocido, selectedAccess, selectedTipo], () => {
     currentPage.value = 1;
     loadMovimientos();
 });
@@ -114,6 +125,7 @@ const loadMovimientos = async (): Promise<void> => {
             page: pagination.value.currentPage,
             per_page: pagination.value.perPage,
             search: globalFilterValue.value,
+            idTipo: selectedTipo.value?? '',
             reconocido: selectedReconocido.value?.value ?? '',
             access: selectedAccess.value?.value ?? '',
         };
@@ -180,10 +192,18 @@ onMounted(() => {
                     <InputText 
                         v-model="globalFilterValue" 
                         @input="onGlobalSearch" 
-                        placeholder="Buscar por espacio y tipo..." 
+                        placeholder="Buscar por espacio" 
                         class="w-full md:w-80"
                     />
                 </IconField>
+                <Select 
+                    v-model="selectedTipo" 
+                    :options="tipoOptions" 
+                    optionLabel="name"
+                    optionValue="value" 
+                    placeholder="Tipo" 
+                    class="w-full md:w-auto" 
+                />
                 <Select 
                     v-model="selectedReconocido" 
                     :options="reconocidoOptions" 
@@ -205,7 +225,14 @@ onMounted(() => {
 
     <Column selectionMode="multiple" style="width: 1rem" />
     <Column field="Espacio" header="Espacio" sortable style="min-width: 12rem" />
-    <Column field="idTipo" header="Tipo" sortable style="min-width: 10rem" />
+    <Column field="idTipo" header="Tipo" sortable style="min-width: 10rem">
+        <template #body="{ data }">
+            <Tag 
+                :value="tipoMovimientoText(data.idTipo)" 
+                :severity="data.idTipo === 1 ? 'info' : 'warning'" 
+            />
+        </template>
+    </Column>
     <Column field="reconocido" header="Reconocido" sortable style="min-width: 8rem">
         <template #body="{ data }">
             <Tag :value="data.reconocido ? 'Sí' : 'No'" :severity="getSeverity(data.reconocido)" />

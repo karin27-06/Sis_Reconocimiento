@@ -20,19 +20,21 @@ const viewAlertaMovementDialog = ref(false);
 const selectedIdMovimientos = ref<number[]>([]);
 
 function viewAlertaMovimientos(alerta: any) {
-    selectedIdMovimientos.value= alerta.idMovimientos;
+    selectedIdMovimientos.value = alerta.idMovimientos;
     viewAlertaMovementDialog.value = true;
 }
-
+const tipoOptions = ref([
+    { name: 'TODOS', value: '' },
+    { name: 'Cara', value: 1 },
+    { name: 'Huella', value: 2 },
+]);
 // Tipos
 interface Alerta {
     id: number;
     idMovimientos: number[];
-    Movimiento: string | number | null;
+    movimientos: { id: number; idTipo: number; tipoDescripcion: string }[];
     descripcion: string | null;
     fecha: string;
-    tipo: number;
-    tipoTexto: string;
     creacion: string;
     actualizacion: string;
 }
@@ -55,12 +57,12 @@ const alertas = ref<Alerta[]>([]);
 const selectedAlertas = ref<Alerta[]>([]);
 const selectedDate = ref<Date | null>(null);
 const loading = ref(false);
+const selectedTipo = ref<number | null>(null);
 const globalFilterValue = ref('');
 const deleteAlertaDialog = ref(false);
 const updateAlertaDialog = ref(false);
 const alerta = ref<Alerta | null>(null);
 const selectedAlertaId = ref<number | null>(null);
-const selectedTipo = ref<number | null>(null);
 const currentPage = ref(1);
 const pagination = ref<Pagination>({
     currentPage: 1,
@@ -68,28 +70,13 @@ const pagination = ref<Pagination>({
     total: 0
 });
 
-// Filtros
-const tipoOptions = ref([
-    { name: 'TODOS', value: '' },
-    { name: 'Huella', value: 1 },
-    { name: 'Cara', value: 2 },
-]);
-
 // Watchers
-watch(() => props.refresh, () => {
-    loadAlertas();
-});
+watch(() => props.refresh, () => loadAlertas());
 
-watch(selectedTipo, () => {
+watch([selectedDate, selectedTipo], () => {
     currentPage.value = 1;
     loadAlertas();
 });
-// Recargar tabla al cambiar fecha
-watch(selectedDate, () => {
-    currentPage.value = 1;
-    loadAlertas();
-});
-
 // Funciones
 function editAlerta(a: Alerta) {
     selectedAlertaId.value = a.id;
@@ -109,7 +96,6 @@ function handleAlertaUpdated() {
     loadAlertas();
 }
 
-
 const loadAlertas = async (): Promise<void> => {
     loading.value = true;
     try {
@@ -117,8 +103,8 @@ const loadAlertas = async (): Promise<void> => {
             page: pagination.value.currentPage,
             per_page: pagination.value.perPage,
             search: globalFilterValue.value,
-            tipo: selectedTipo.value ?? '',
-            fecha: selectedDate.value ? selectedDate.value.toISOString().slice(0, 10) : '' // 🔥 enviamos la fecha al backend en formato yyyy-mm-dd
+            tipo: selectedTipo.value?? '',
+            fecha: selectedDate.value ? selectedDate.value.toISOString().slice(0, 10) : ''
         };
         const response = await axios.get('/alerta', { params });
         alertas.value = response.data.data;
@@ -145,9 +131,7 @@ const onGlobalSearch = debounce(() => {
     loadAlertas();
 }, 500);
 
-onMounted(() => {
-    loadAlertas();
-});
+onMounted(() => loadAlertas());
 </script>
 
 <template>
@@ -176,7 +160,7 @@ onMounted(() => {
         <!-- Contenedor derecho -->
         <div class="flex flex-col items-end gap-2 w-full md:w-auto">
 
-            <!-- FILTRO FECHA (ARRIBA) -->
+            <!-- FILTRO FECHA -->
             <div class="flex flex-row gap-2">
                 <Calendar 
                     v-model="selectedDate" 
@@ -193,7 +177,7 @@ onMounted(() => {
                 />
             </div>
 
-            <!-- SELECT Y BUSCADOR (ABAJO) -->
+            <!-- BUSCADOR GLOBAL -->
             <div class="flex flex-row gap-2">
                 <IconField class="w-full md:w-auto">
                     <InputIcon>
@@ -226,32 +210,44 @@ onMounted(() => {
     </div>
 </template>
 
-    <Column selectionMode="multiple" style="width: 1rem" />
-    <Column header="Movimientos" style="min-width: 10rem">
+<Column selectionMode="multiple" style="width: 1rem" />
+<Column header="Movimientos" style="min-width: 10rem">
     <template #body="{ data }">
-            <span v-if="Array.isArray(data.idMovimientos)">
-                {{ data.idMovimientos.join(', ') }}
-            </span>
-            <span v-else>-</span>
-        </template>
-    </Column>
-    <Column field="descripcion" header="Descripción" sortable style="min-width: 12rem" />
-    <Column field="fecha" header="Fecha" sortable style="min-width: 10rem" />
-    <Column field="tipoTexto" header="Tipo" sortable style="min-width: 8rem">
-        <template #body="{ data }">
-            <Tag :value="data.tipoTexto" :severity="data.tipo === 1 ? 'info' : 'warning'" />
-        </template>
-    </Column>
-    <Column field="creacion" header="Creación" sortable style="min-width: 13rem" />
-    <Column field="actualizacion" header="Actualización" sortable style="min-width: 13rem" />
-    <Column field="acciones" header="Acciones" :exportable="false" style="min-width: 10rem">
-        <template #body="{ data }">
-            <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="viewAlertaMovimientos(data)" />
-            <Button icon="pi pi-pencil" outlined rounded class="mr-2 mb-2 md:mb-0" @click="editAlerta(data)" />
-            <Button icon="pi pi-trash" outlined rounded severity="danger" class="mb-2 md:mb-0" @click="confirmDeleteAlerta(data)" />
-        </template>
-        </Column>
+        <span v-if="Array.isArray(data.idMovimientos)">
+            {{ data.idMovimientos.join(', ') }}
+        </span>
+        <span v-else>-</span>
+    </template>
+</Column>
+<Column field="descripcion" header="Descripción" sortable style="min-width: 12rem" />
+<Column field="fecha" header="Fecha" sortable style="min-width: 10rem" />
+
+<!-- NUEVA COLUMNA: Tipos únicos de movimientos -->
+<Column header="Tipo(s)" style="min-width: 12rem">
+    <template #body="{ data }: { data: Alerta }">
+        <div class="flex flex-wrap gap-2">
+            <Tag
+                v-for="tipo in [...new Map(data.movimientos.map((m: { idTipo: number; tipoDescripcion: string }) => [m.idTipo, m.tipoDescripcion])).values()]"
+                :key="tipo"
+                :value="tipo"
+                severity="info"
+                class="text-white"
+            />
+        </div>
+    </template>
+</Column>
+
+<Column field="creacion" header="Creación" sortable style="min-width: 13rem" />
+<Column field="actualizacion" header="Actualización" sortable style="min-width: 13rem" />
+<Column field="acciones" header="Acciones" :exportable="false" style="min-width: 10rem">
+    <template #body="{ data }">
+        <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="viewAlertaMovimientos(data)" />
+        <Button icon="pi pi-pencil" outlined rounded class="mr-2 mb-2 md:mb-0" @click="editAlerta(data)" />
+        <Button icon="pi pi-trash" outlined rounded severity="danger" class="mb-2 md:mb-0" @click="confirmDeleteAlerta(data)" />
+    </template>
+</Column>
 </DataTable>
+
 <ViewAlerta
   v-model:visible="viewAlertaMovementDialog"
   :idMovimientos="selectedIdMovimientos"

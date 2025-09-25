@@ -15,7 +15,7 @@ class UpdateMovementRequest extends FormRequest
     {
         return [
             'idEspacio' => 'required|exists:spaces,id',
-            'idTipo' => 'required|integer',
+            'idTipo' => 'required|in:1,2', // 🔹 Solo acepta 1 (Cara) o 2 (Huella)
             'reconocido' => 'required|boolean',
             'access' => 'required|boolean',
             'error' => 'nullable|string|max:3',
@@ -32,7 +32,7 @@ class UpdateMovementRequest extends FormRequest
             'idEspacio.exists' => 'El espacio seleccionado no es válido.',
 
             'idTipo.required' => 'El tipo de movimiento es obligatorio.',
-            'idTipo.integer' => 'El tipo de movimiento debe ser un número entero.',
+            'idTipo.in' => 'El tipo de movimiento debe ser Cara (1) o Huella (2).',
 
             'reconocido.required' => 'El campo reconocido es obligatorio.',
             'reconocido.boolean' => 'El campo reconocido debe ser verdadero o falso.',

@@ -16,7 +16,7 @@ class MovementPDFController extends Controller
             return [
                 'id' => $movement->id,
                 'espacio_name' => $movement->espacio->name,
-                'idTipo' => $movement->idTipo,
+                'idTipo' => $movement->idTipo === 1 ? 'Cara' : 'Huella',
                 'reconocido' => $movement->reconocido ? 'Sí' : 'No',
                 'access' => $movement->access ? 'Si' : 'No',
                 'error' => $movement->error ?? '-',

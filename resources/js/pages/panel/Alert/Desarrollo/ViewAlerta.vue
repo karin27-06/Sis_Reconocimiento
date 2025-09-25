@@ -20,17 +20,26 @@
       >
         <Column field="id" header="ID" style="width: 5%" />
         <Column field="Espacio" header="Espacio" style="width: 20%" />
-        <Column field="idTipo" header="Tipo" style="width: 10%" />
+        
+        <!-- Tipo como tag -->
+        <Column header="Tipo" style="width: 10%">
+          <template #body="{ data }">
+            <Tag :value="data.tipoDescripcion" :severity="data.idTipo === 1 ? 'info' : 'warning'" />
+          </template>
+        </Column>
+
         <Column field="reconocido" header="Reconocido" style="width: 10%">
           <template #body="{ data }">
             <Tag :value="data.reconocido ? 'Sí' : 'No'" :severity="data.reconocido ? 'success' : 'danger'" />
           </template>
         </Column>
+
         <Column field="access" header="Acceso" style="width: 10%">
           <template #body="{ data }">
-            <Tag :value="data.access ? 'Si' : 'No'" :severity="data.access ? 'success' : 'danger'" />
+            <Tag :value="data.access ? 'Sí' : 'No'" :severity="data.access ? 'success' : 'danger'" />
           </template>
         </Column>
+
         <Column field="error" header="Error" style="width: 10%" />
         <Column field="fechaEnvioESP32" header="Envío ESP32" style="width: 15%" />
         <Column field="fechaRecepcion" header="Recepción" style="width: 15%" />
@@ -45,7 +54,7 @@
     <template #footer>
       <Button label="Cerrar" icon="pi pi-times" text @click="dialogVisible = false" />
     </template>
-  </Dialog>
+</Dialog>
 </template>
 
 <script setup lang="ts">
@@ -63,12 +72,13 @@ interface Movimiento {
   idEspacio: number;
   Espacio: string;
   idTipo: number;
+  tipoDescripcion: string; // 🔥 usamos este campo de la API
   reconocido: boolean;
   access: boolean;
   error: string | null;
-  fechaEnvioESP32: string;
-  fechaRecepcion: string;
-  fechaReconocimiento: string;
+  fechaEnvioESP32: string | null;
+  fechaRecepcion: string | null;
+  fechaReconocimiento: string | null;
   creacion: string;
   actualizacion: string;
 }
@@ -109,8 +119,13 @@ async function fetchMovimientos(ids: number[]) {
       return;
     }
 
-    // 🎯 Filtramos solo los que coinciden con los IDs
-    movimientos.value = res.data.data.filter((m: Movimiento) => ids.includes(m.id));
+    // Filtramos solo los movimientos seleccionados
+    movimientos.value = res.data.data
+      .filter((m: Movimiento) => ids.includes(m.id))
+      .map((m: Movimiento) => ({
+        ...m,
+        tipoDescripcion: m.tipoDescripcion || (m.idTipo === 1 ? 'Cara' : 'Huella')
+      }));
   } catch (error) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los movimientos', life: 3000 });
     console.error(error);

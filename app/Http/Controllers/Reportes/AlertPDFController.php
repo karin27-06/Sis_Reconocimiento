@@ -16,13 +16,20 @@ class AlertPDFController extends Controller
 
         // Convertir a array con formato
         $alertsArray = $alerts->map(function ($alert) {
+            // obtenemos los movimientos
+            $movimientos = $alert->movimientos();
+
+            // sacamos los tipos
+            $tipos = $movimientos->map(function ($mov) {
+                return $mov->idTipo === 1 ? 'Cara' : 'Huella';
+            })->unique()->implode(', ');
+
             return [
                 'id'          => $alert->id,
-                // 🔥 ahora puede tener varios movimientos
-                'movimientos' => $alert->movimientos()->pluck('id')->implode(', ') ?: 'Sin movimientos',
+                'movimientos' => $movimientos->pluck('id')->implode(', ') ?: 'Sin movimientos',
                 'descripcion' => $alert->descripcion,
                 'fecha'       => $alert->fecha ? Carbon::parse($alert->fecha)->format('d-m-Y') : null,
-                'tipo'        => $alert->tipo == 1 ? 'Huella' : ($alert->tipo == 2 ? 'Cara' : 'Desconocido'),
+                'tipo'        => $tipos ?: 'Sin tipo',
                 'created_at'  => Carbon::parse($alert->created_at)->format('d-m-Y H:i:s A'),
                 'updated_at'  => Carbon::parse($alert->updated_at)->format('d-m-Y H:i:s A'),
             ];

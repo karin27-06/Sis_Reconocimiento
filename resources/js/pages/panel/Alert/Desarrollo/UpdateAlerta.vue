@@ -38,20 +38,19 @@
                     <small v-if="serverErrors.descripcion" class="text-red-500">{{ serverErrors.descripcion[0] }}</small>
                 </div>
 
-                <!-- Tipo -->
+                <!-- Tipos deducidos -->
                 <div class="col-span-12">
-                    <label class="block font-bold mb-2">Tipo <span class="text-red-500">*</span></label>
-                    <Dropdown
-                        v-model="alerta.tipo"
-                        :options="tipos"
-                        optionLabel="label"
-                        optionValue="value"
-                        placeholder="Seleccione el tipo de alerta"
-                        class="w-full"
-                        :class="{ 'p-invalid': serverErrors.tipo }"
-                    />
-                    <small v-if="submitted && !alerta.tipo" class="text-red-500">Debe seleccionar un tipo.</small>
-                    <small v-if="serverErrors.tipo" class="text-red-500">{{ serverErrors.tipo[0] }}</small>
+                    <label class="block font-bold mb-2">Tipo(s)</label>
+                    <div class="flex flex-wrap gap-2">
+                        <Tag
+                            v-for="tipo in tiposUnicos"
+                            :key="tipo"
+                            :value="tipo"
+                            severity="info"
+                            class="text-white"
+                        />
+                        <span v-if="tiposUnicos.length === 0" class="text-gray-500">No hay tipos asignados</span>
+                    </div>
                 </div>
 
                 <!-- Fecha -->
@@ -77,25 +76,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import axios, { AxiosError } from 'axios';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
-import { useToast } from 'primevue/usetoast';
 import MultiSelect from 'primevue/multiselect';
+import Tag from 'primevue/tag';
+import { useToast } from 'primevue/usetoast';
 
 // Tipos
 interface Alerta {
-    idMovimientos: number[];   // ✅ array de IDs
+    idMovimientos: number[];
     descripcion: string;
-    tipo: number | null;
     fecha: string;
 }
 
 interface Movimiento {
     id: number;
+    idTipo: number;
+    tipoDescripcion: string;
 }
 
 interface ServerErrors {
@@ -123,15 +123,8 @@ const movimientos = ref<Movimiento[]>([]);
 const alerta = ref<Alerta>({
     idMovimientos: [],
     descripcion: '',
-    tipo: null,
     fecha: ''
 });
-
-// Opciones de tipo (1 = Huella, 2 = Cara)
-const tipos = [
-    { label: 'Huella', value: 1 },
-    { label: 'Cara', value: 2 }
-];
 
 // Toast
 const toast = useToast();
@@ -146,6 +139,15 @@ watch(() => props.visible, (val) => {
 });
 watch(dialogVisible, (val) => emit('update:visible', val));
 
+// Computed: tipos únicos según movimientos seleccionados
+const tiposUnicos = computed(() => {
+    const tipos = movimientos.value
+        .filter(m => alerta.value.idMovimientos.includes(m.id))
+        .map(m => m.tipoDescripcion);
+    // Eliminar duplicados
+    return [...new Set(tipos)];
+});
+
 // Cargar alerta
 const fetchAlerta = async (): Promise<void> => {
     try {
@@ -157,19 +159,16 @@ const fetchAlerta = async (): Promise<void> => {
         }
         const data = res.data.alert;
 
-        // Convertir la fecha de "DD-MM-YYYY" a "YYYY-MM-DD"
+        // Convertir fecha a formato YYYY-MM-DD
         let fechaISO = '';
         if (data.fecha) {
-            const partes = data.fecha.split('-'); // ["14", "09", "2025"]
-            if (partes.length === 3) {
-                fechaISO = `${partes[2]}-${partes[1]}-${partes[0]}`; // "2025-09-14"
-            }
+            const partes = data.fecha.split('-');
+            if (partes.length === 3) fechaISO = `${partes[2]}-${partes[1]}-${partes[0]}`;
         }
 
         alerta.value = {
             idMovimientos: Array.isArray(data.idMovimientos) ? data.idMovimientos : [],
             descripcion: data.descripcion ?? '',
-            tipo: data.tipo ?? null,
             fecha: fechaISO
         };
     } catch (error) {
@@ -195,7 +194,7 @@ const fetchMovimientos = async (): Promise<void> => {
 const updateAlerta = async (): Promise<void> => {
     submitted.value = true;
     serverErrors.value = {};
-    if (!alerta.value.descripcion || !alerta.value.tipo) return;
+    if (!alerta.value.descripcion) return;
 
     try {
         loading.value = true;

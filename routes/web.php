@@ -111,6 +111,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('config_alerta')->group(function () {
         Route::get('/', [ConfigAlertController::class, 'index'])->name('config_alerta.index');
         Route::post('/', [ConfigAlertController::class, 'store'])->name('config_alertas.store');
+        Route::get('/latest', [ConfigAlertController::class, 'latest'])->name('config_alertas.latest'); // 👈 nuevo
         Route::get('/{configAlert}', [ConfigAlertController::class, 'show'])->name('config_alertas.show');
         Route::put('/{configAlert}', [ConfigAlertController::class, 'update'])->name('config_alertas.update');
         Route::delete('/{configAlert}', [ConfigAlertController::class, 'destroy'])->name('config_alertas.destroy');

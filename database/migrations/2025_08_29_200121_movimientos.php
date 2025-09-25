@@ -17,8 +17,9 @@ return new class extends Migration
             // Relación con spaces
             $table->foreignId('idEspacio')->constrained('spaces','id');
 
-            // Otros campos
-            $table->integer('idTipo');
+            // Tipo de reconocimiento (1 = Cara, 2 = Huella)
+            $table->tinyInteger('idTipo')->comment('1: Cara, 2: Huella');
+
             $table->boolean('reconocido')->default(false)->comment('0: No reconocido, 1: Reconocido');
             $table->boolean('access')->default(false)->comment('0: Sin acceso, 1: Con acceso');
             $table->string('error', 3)->nullable();
