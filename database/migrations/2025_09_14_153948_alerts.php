@@ -15,13 +15,11 @@ return new class extends Migration
             $table->id();
 
             // 🔥 En lugar de 1 solo idMovimiento, ahora un JSON con varios IDs
-$table->json('idMovimientos')->nullable();
+            $table->json('idMovimientos')->nullable();
 
             // Otros campos
             $table->string('descripcion')->nullable(); // No es obligatoria
             $table->date('fecha'); // Solo la fecha
-            $table->tinyInteger('tipo')->comment('1: Huella, 2: Cara');
-
             $table->timestamps(); // created_at y updated_at
         });
     }

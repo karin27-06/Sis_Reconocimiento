@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 class FilterByMovement {
     private $search;
+    private $idTipo; // 🔹 añadimos propiedad
 
-    public function __construct($search) {
+    public function __construct($search, $idTipo = null) {
         $this->search = $search;
+        $this->idTipo = $idTipo; // 🔹 inicializamos
     }
 
     public function __invoke(Builder $builder, Closure $next) {
@@ -22,10 +24,13 @@ class FilterByMovement {
                   // Buscar por nombre del espacio (parcial, case-insensitive)
                   ->orWhereHas('espacio', function ($q2) use ($searchLower) {
                       $q2->whereRaw('LOWER(name) LIKE ?', ['%' . $searchLower . '%']);
-                  })
-                  // Buscar por idTipo exacto o parcial
-                  ->orWhere('idTipo', 'like', '%' . $searchLower . '%');
+                  });
             });
+        }
+
+        // 🔹 Filtrar por idTipo
+        if (!is_null($this->idTipo) && $this->idTipo !== '') {
+            $builder->where('idTipo', $this->idTipo);
         }
 
         return $next($builder);

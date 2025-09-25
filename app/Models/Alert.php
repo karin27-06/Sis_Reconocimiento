@@ -12,27 +12,24 @@ class Alert extends Model
     protected $table = 'alerts';
 
     protected $fillable = [
-        'idMovimientos',  // 👈 ahora es JSON
+        'idMovimientos',  
         'descripcion',
         'fecha',
-        'tipo',
     ];
 
     protected $casts = [
-        'idMovimientos' => 'array', // 👈 se convierte automáticamente en array
+        'idMovimientos' => 'array',
         'fecha' => 'date',
-        'tipo' => 'integer',
     ];
 
     /**
      * Relación con los movimientos.
-     * Devuelve una colección de Movement según los IDs guardados en idMovimientos.
      */
     public function movimientos()
     {
         if (empty($this->idMovimientos)) {
-        return collect();
-    }
+            return collect();
+        }
         return Movement::whereIn('id', $this->idMovimientos)->get();
     }
 }

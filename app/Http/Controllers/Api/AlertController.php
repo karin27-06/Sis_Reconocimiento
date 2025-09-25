@@ -22,9 +22,9 @@ class AlertController extends Controller
         Gate::authorize('viewAny', Alert::class);
 
         $perPage = $request->input('per_page', 15);
-        $search = $request->input('search');
-        $tipo = $request->input('tipo');
-        $fecha = $request->input('fecha');
+        $search  = $request->input('search');
+        $tipo    = $request->input('tipo');
+        $fecha   = $request->input('fecha');
 
         $query = app(Pipeline::class)
             ->send(Alert::query())

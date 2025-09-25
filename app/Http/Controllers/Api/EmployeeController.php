@@ -108,8 +108,17 @@ class EmployeeController extends Controller
             'employee' => new EmployeeResource($employee->refresh())
         ]);
     }
-    public function destroy(Employee $employee){
+    public function destroy(Employee $employee)
+    {
         Gate::authorize('delete', $employee);
+
+        // Primero validamos si tiene relaciones
+        if ($employee->tieneRelaciones()) {
+            return response()->json([
+                'state'  => false,
+                'message'=> 'No se puede eliminar este empleado porque tiene relaciones con otros registros.'
+            ], 400);
+        }
 
         // Construir la ruta completa de la foto
         $fotoPath = $employee->foto ? public_path($this->uploadPath . '/' . $employee->foto) : null;
@@ -118,13 +127,7 @@ class EmployeeController extends Controller
         if ($fotoPath && file_exists($fotoPath)) {
             unlink($fotoPath);
         }
-        if($employee->tieneRelaciones())
-        {
-            return response()->json([
-                'state'=>false,
-                'message'=> 'No se puede eliminar este empleado porque tiene relaciones con otros registros.'
-            ],400);
-        }
+        // Eliminar empleado
         $employee->delete();
 
         return response()->json([
