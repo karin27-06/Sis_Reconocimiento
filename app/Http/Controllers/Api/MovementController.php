@@ -24,11 +24,12 @@ class MovementController extends Controller
         Gate::authorize('viewAny', Movement::class);
         $perPage = $request->input('per_page', 15);
         $search = $request->input('search');
+        $idTipo = $request->input('idTipo'); // 🔹 obtenemos idTipo del request
 
         $query = app(Pipeline::class)
             ->send(Movement::query())
             ->through([
-                new FilterByMovement($search),
+                new FilterByMovement($search, $idTipo), // 🔹 pasamos idTipo al pipeline
                 new FilterByReconocido($request->input('reconocido')),
                 new FilterByAccess($request->input('access')),
             ])

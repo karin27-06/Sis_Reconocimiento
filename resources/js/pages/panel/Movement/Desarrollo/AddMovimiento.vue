@@ -38,7 +38,14 @@
                 <!-- Tipo -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Tipo <span class="text-red-500">*</span></label>
-                    <InputText v-model.trim="movimiento.idTipo" placeholder="Ingrese tipo de movimiento" class="w-full"/>
+                    <Dropdown
+                        v-model="movimiento.idTipo"
+                        :options="tiposMovimiento"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccione un tipo"
+                        class="w-full"
+                    />
                     <small v-if="submitted && !movimiento.idTipo" class="text-red-500">El tipo es obligatorio.</small>
                     <small v-if="serverErrors.idTipo" class="text-red-500">{{ serverErrors.idTipo[0] }}</small>
                 </div>
@@ -103,10 +110,16 @@ import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
 import ToolsMovement from './toolsMovement.vue';
 
+
+const tiposMovimiento = ref([
+    { label: 'Cara', value: 1 },
+    { label: 'Huella', value: 2 }
+]);
+
 // Tipos
 interface Movimiento {
     idEspacio: number | null;
-    idTipo: string;
+    idTipo: number | null; // 🔹 Cambiado a number
     reconocido: boolean;
     access: boolean;
     error: string;
@@ -132,7 +145,7 @@ const emit = defineEmits<{
 
 const movimiento = ref<Movimiento>({
     idEspacio: null,
-    idTipo: '',
+    idTipo: null, // 🔹 Número en lugar de string
     reconocido: false,
     access: false,
     error: '',
@@ -158,7 +171,7 @@ function hideDialog() {
 function resetMovimiento() {
     movimiento.value = {
         idEspacio: null,
-        idTipo: '',
+        idTipo: null,
         reconocido: false,
         access: false,
         error: '',

@@ -22,7 +22,7 @@ class MovementExport implements FromCollection, WithHeadings, WithMapping, WithS
         return [
             $movement->id,
             $movement->espacio->name,
-            $movement->idTipo,
+            $movement->idTipo === 1 ? 'Cara' : 'Huella',
             $movement->reconocido ? 'Sí' : 'No',
             $movement->access ? 'Si' : 'No',
             $movement->error ?? '-',

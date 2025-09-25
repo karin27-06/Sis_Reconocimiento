@@ -30,9 +30,12 @@
                 <!-- Tipo -->
                 <div class="col-span-12">
                     <label class="block font-bold mb-2">Tipo <span class="text-red-500">*</span></label>
-                    <InputText 
-                        v-model.trim="movimiento.idTipo" 
-                        placeholder="Ingrese tipo de movimiento" 
+                    <Dropdown
+                        v-model="movimiento.idTipo"
+                        :options="tiposMovimiento"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccione un tipo"
                         class="w-full"
                         :class="{ 'p-invalid': serverErrors.idTipo }"
                     />
@@ -119,10 +122,16 @@ import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import { useToast } from 'primevue/usetoast';
 
+
+// Tipos de movimiento
+const tiposMovimiento = ref([
+    { label: 'Cara', value: 1 },
+    { label: 'Huella', value: 2 },
+]);
 // Tipos
 interface Movimiento {
     idEspacio: number | null;
-    idTipo: string;
+    idTipo: number | null; // 🔹 Cambiado a number
     reconocido: boolean;
     access: boolean;
     error: string;
@@ -160,7 +169,7 @@ const serverErrors = ref<ServerErrors>({});
 const espacios = ref<Espacio[]>([]);
 const movimiento = ref<Movimiento>({
     idEspacio: null,
-    idTipo: '',
+    idTipo: null,
     reconocido: false,
     access: false,
     error: '',
@@ -206,7 +215,7 @@ const fetchMovimiento = async (): Promise<void> => {
         const data = res.data.movement;
         movimiento.value = {
             idEspacio: data.idEspacio ?? null,
-            idTipo: data.idTipo ?? '',
+            idTipo: data.idTipo ?? null,
             reconocido: data.reconocido ?? false,
             access: data.access ?? false,
             error: data.error ?? '',

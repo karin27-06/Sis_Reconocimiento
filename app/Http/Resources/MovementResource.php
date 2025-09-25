@@ -15,6 +15,7 @@ class MovementResource extends JsonResource
             'idEspacio' => $this->idEspacio,
             'Espacio' => $this->espacio->name, // Relación con la tabla spaces
             'idTipo' => $this->idTipo,
+            'tipoDescripcion' => $this->idTipo === 1 ? 'Cara' : 'Huella', // 🔹 Traducción del idTipo
             'reconocido' => $this->reconocido,
             'access' => $this->access,
             'error' => $this->error,

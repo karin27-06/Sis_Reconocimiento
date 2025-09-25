@@ -89,4 +89,17 @@ class ConfigAlertController extends Controller
         set_time_limit(0);
         return Excel::download(new ConfigAlertExport, 'ConfigAlertas.xlsx');
     }
+
+    public function latest()
+    {
+        Gate::authorize('viewAny', ConfigAlert::class);
+
+        $configAlert = ConfigAlert::latest()->first();
+
+        return response()->json([
+            'state' => true,
+            'message' => $configAlert ? 'Última configuración encontrada.' : 'No hay configuraciones registradas.',
+            'configAlert' => $configAlert ? new ConfigAlertResource($configAlert) : null,
+        ]);
+    }
 }
