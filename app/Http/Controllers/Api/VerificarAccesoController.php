@@ -228,10 +228,23 @@ $respuesta['idEmpleado']   = $empleadoId ?? null;
 $respuesta['relacionGuardada'] = isset($empleadoId);
 
 if (($respuesta['acceso'] ?? 1) === 0) {
-    // movimientos fallidos últimos 30 minutos
+
+    // 🔎 Obtener la configuración más reciente
+    $config = DB::table('alert_configuration')
+        ->orderBy('id', 'desc')
+        ->first();
+
+    // Valores por defecto si no hay configuración
+    $timeHours = $config->time ?? 0.5;   // ejemplo: 0.5 horas = 30 minutos
+    $amount    = $config->amount ?? 3;   // cantidad mínima de intentos
+
+    // Convertir horas decimales a minutos
+    $timeMinutes = (int) round($timeHours * 60);
+
+    // movimientos fallidos dentro de ese rango de tiempo
     $fallidos = DB::table('movimientos')
         ->where('access', 0)
-        ->where('created_at', '>=', Carbon::now()->subMinutes(30))
+        ->where('created_at', '>=', Carbon::now()->subMinutes($timeMinutes))
         ->pluck('id')
         ->toArray();
 
@@ -247,16 +260,18 @@ if (($respuesta['acceso'] ?? 1) === 0) {
     // excluir movimientos ya alertados
     $fallidos = array_values(array_diff($fallidos, $usadosEnAlertas));
 
-    if (count($fallidos) >= 3) {
+    // Condicional con los valores de configuración
+    if (count($fallidos) >= $amount) {
         DB::table('alerts')->insert([
             'idMovimientos' => json_encode($fallidos),
-            'descripcion'   => '⚠️ Se detectaron ' . count($fallidos) . ' intentos fallidos en los últimos 30 minutos',
+            'descripcion'   => '⚠️ Se detectaron ' . count($fallidos) .
+                               " intentos fallidos en los últimos {$timeMinutes} minutos",
             'fecha'         => Carbon::now()->toDateString(),
             'created_at'    => Carbon::now(),
             'updated_at'    => Carbon::now(),
         ]);
 
-        $respuesta['alerta_generada']   = true;
+        $respuesta['alerta_generada']    = true;
         $respuesta['movimientos_alerta'] = $fallidos;
     } else {
         $respuesta['alerta_generada'] = false;
