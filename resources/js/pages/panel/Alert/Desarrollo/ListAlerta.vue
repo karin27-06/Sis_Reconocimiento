@@ -70,6 +70,7 @@ const pagination = ref<Pagination>({
     total: 0
 });
 
+
 // Watchers
 watch(() => props.refresh, () => loadAlertas());
 

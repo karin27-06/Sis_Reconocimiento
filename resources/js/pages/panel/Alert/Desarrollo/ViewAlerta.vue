@@ -39,7 +39,6 @@
             <Tag :value="data.access ? 'Sí' : 'No'" :severity="data.access ? 'success' : 'danger'" />
           </template>
         </Column>
-
         <Column field="error" header="Error" style="width: 10%" />
         <Column field="fechaEnvioESP32" header="Envío ESP32" style="width: 15%" />
         <Column field="fechaRecepcion" header="Recepción" style="width: 15%" />

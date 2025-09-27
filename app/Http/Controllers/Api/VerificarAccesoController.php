@@ -13,7 +13,7 @@ class VerificarAccesoController extends Controller
     public function verificar(Request $request)
     {
         date_default_timezone_set('America/Lima');
-
+$empleadoId = null;
         $codigosErrores = [
             0   => 'Sin error',
             101 => 'Error al tomar la foto en ESP32',
@@ -113,6 +113,7 @@ class VerificarAccesoController extends Controller
 
                     if ($empleadoReconocido) {
                         $respuesta['reconocido'] = 1;
+                        $empleadoId= $empleado->id ?? '';
                         $respuesta['nombre'] = $empleadoReconocido->name;
                         $respuesta['apellido'] = $empleadoReconocido->apellido;
 
@@ -157,6 +158,7 @@ class VerificarAccesoController extends Controller
 
                     if ($empleado) {
                         $respuesta['reconocido'] = 1;
+                        $empleadoId= $empleado->id ?? '';
                         $respuesta['nombre'] = $empleado->name ?? '';
                         $respuesta['apellido'] = $empleado->apellido ?? '';
 
@@ -221,60 +223,60 @@ class VerificarAccesoController extends Controller
                     ]);
                 }
             }    
-            $respuesta['idMovimiento'] = $idMovimiento;
-            $respuesta['idEmpleado']   = $empleadoId;
-            $respuesta['relacionGuardada'] = true;    
-            
-            
-// 🚨 CONDICIONAL: 5 intentos fallidos en 30 minutos => crear alerta
-if (($respuesta['reconocido'] ?? 0) === 0) {
-    // Traer todos los movimientos fallidos últimos 30 min
-    $movimientosFallidos = DB::table('movimientos')
-        ->where('reconocido', 0)
-        ->where('created_at', '>=', Carbon::now()->subMinutes(30))
+$respuesta['idMovimiento'] = $idMovimiento;
+$respuesta['idEmpleado']   = $empleadoId ?? null;
+$respuesta['relacionGuardada'] = isset($empleadoId);
+
+if (($respuesta['acceso'] ?? 1) === 0) {
+
+    // 🔎 Obtener la configuración más reciente
+    $config = DB::table('alert_configuration')
+        ->orderBy('id', 'desc')
+        ->first();
+
+    // Valores por defecto si no hay configuración
+    $timeHours = $config->time ?? 0.5;   // ejemplo: 0.5 horas = 30 minutos
+    $amount    = $config->amount ?? 3;   // cantidad mínima de intentos
+
+    // Convertir horas decimales a minutos
+    $timeMinutes = (int) round($timeHours * 60);
+
+    // movimientos fallidos dentro de ese rango de tiempo
+    $fallidos = DB::table('movimientos')
+        ->where('access', 0)
+        ->where('created_at', '>=', Carbon::now()->subMinutes($timeMinutes))
         ->pluck('id')
         ->toArray();
 
-    $intentosFallidos = count($movimientosFallidos);
+    // ids ya utilizados en alertas previas
+    $usadosEnAlertas = DB::table('alerts')
+        ->pluck('idMovimientos')
+        ->map(function ($json) {
+            return json_decode($json, true) ?: [];
+        })
+        ->flatten()
+        ->toArray();
 
-    if ($intentosFallidos >= 5) {
-   // Ordenar y json_encode para comparar
-sort($movimientosFallidos);
-$jsonIds = json_encode($movimientosFallidos);
+    // excluir movimientos ya alertados
+    $fallidos = array_values(array_diff($fallidos, $usadosEnAlertas));
 
-// Revisar si ya existe alerta con esos movimientos exactos
-$alertaExistente = DB::table('alerts')
-    ->where('descripcion', 'like', '%intentos fallidos%')
-    ->where('idMovimientos', $jsonIds)
-    ->exists();
+    // Condicional con los valores de configuración
+    if (count($fallidos) >= $amount) {
+        DB::table('alerts')->insert([
+            'idMovimientos' => json_encode($fallidos),
+            'descripcion'   => '⚠️ Se detectaron ' . count($fallidos) .
+                               " intentos fallidos en los últimos {$timeMinutes} minutos",
+            'fecha'         => Carbon::now()->toDateString(),
+            'created_at'    => Carbon::now(),
+            'updated_at'    => Carbon::now(),
+        ]);
 
-if (!$alertaExistente) {
-    try {
-    DB::table('alerts')->insert([
-        'idMovimientos' => $jsonIds,
-        'descripcion'   => "Se detectaron $intentosFallidos intentos fallidos de acceso en los últimos 30 minutos.",
-        'fecha'         => Carbon::now()->toDateString(),
-        'tipo'          => $idTipo,
-        'created_at'    => Carbon::now(),
-        'updated_at'    => Carbon::now(),
-    ]);
-
-    $respuesta['alerta_generada'] = true;
-    $respuesta['movimientos_alerta'] = $movimientosFallidos;
-} catch (Exception $ex) {
-    $respuesta['alerta_generada'] = false;
-    $respuesta['error_insert_alert'] = $ex->getMessage();
-}
-
-}else {
-            $respuesta['alerta_generada'] = false;
-            $respuesta['mensaje'] = 'Ya existe una alerta con esos intentos.';
-        }
+        $respuesta['alerta_generada']    = true;
+        $respuesta['movimientos_alerta'] = $fallidos;
     } else {
         $respuesta['alerta_generada'] = false;
     }
 }
-
 
 
         } catch (Exception $e) {
