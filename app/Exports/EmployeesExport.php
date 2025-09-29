@@ -36,7 +36,7 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping, With
     return [
             ['LISTA DE EMPLEADOS', '', '', '', '', '', '', ''],
             [],
-            ['ID', 'Nombre Completo', 'Código', 'Tipo de empleado', 'ID Huella', 'Estado', 'Creación', 'Actualización']
+            ['ID', 'Nombre Completo', 'DNI', 'Tipo de empleado', 'ID Huella', 'Estado', 'Creación', 'Actualización']
         ];
 
     }
