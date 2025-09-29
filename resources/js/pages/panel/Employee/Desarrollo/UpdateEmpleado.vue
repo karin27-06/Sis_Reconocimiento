@@ -24,11 +24,11 @@
           <small v-if="serverErrors.apellido" class="text-red-500">{{ serverErrors.apellido[0] }}</small>
         </div>
 
-        <!-- Código -->
+        <!-- DNI -->
         <div class="col-span-12 sm:col-span-6">
-          <label class="block font-bold mb-2">Código <span class="text-red-500">*</span></label>
-          <InputText v-model="empleado.codigo" placeholder="Ingrese su código" maxlength="8" class="w-full" />
-          <small v-if="submitted && !empleado.codigo" class="text-red-500">El código es obligatorio.</small>
+          <label class="block font-bold mb-2">DNI <span class="text-red-500">*</span></label>
+          <InputText v-model="empleado.codigo" placeholder="Ingrese su DNI" maxlength="8" class="w-full" />
+          <small v-if="submitted && !empleado.codigo" class="text-red-500">El DNI es obligatorio.</small>
           <small v-if="serverErrors.codigo" class="text-red-500">{{ serverErrors.codigo[0] }}</small>
         </div>
 

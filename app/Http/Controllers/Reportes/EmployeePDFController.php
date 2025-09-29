@@ -54,7 +54,7 @@ class EmployeePDFController extends Controller
         $pdf->SetFont('helvetica', 'B', 9);
         $pdf->SetFillColor(242, 242, 242);  // Color de fondo para los encabezados
 
-        $header = ['ID', 'Nombre Completo', 'Código', 'Tipo de empleado', 'Estado', 'Foto', 'Creación', 'Actualización'];
+        $header = ['ID', 'Nombre Completo', 'DNI', 'Tipo de empleado', 'Estado', 'Foto', 'Creación', 'Actualización'];
         $widths = [10, 35, 25, 30, 18, 20, 25, 25];  // Tamaños adecuados para las celdas
         // Establecer los encabezados de la tabla en la primera página
         foreach ($header as $i => $col) {
