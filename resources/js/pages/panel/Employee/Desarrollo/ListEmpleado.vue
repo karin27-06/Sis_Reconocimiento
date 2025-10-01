@@ -53,7 +53,7 @@
     <Column selectionMode="multiple" style="width: 1rem" :exportable="false" />
     <Column field="name" header="Nombre" sortable style="min-width: 8rem" />
     <Column field="apellido" header="Apellido" sortable style="min-width: 8rem" />
-    <Column field="codigo" header="Código" sortable style="min-width: 6rem" />
+    <Column field="codigo" header="DNI" sortable style="min-width: 6rem" />
     <Column field="empleadoType" header="Tipo de Empleado" sortable style="min-width: 10rem" />
     <Column field="idHuella" header="ID Huella" sortable style="min-width: 6rem" />
     <Column field="creacion" header="Creación" sortable style="min-width: 10rem" />

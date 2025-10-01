@@ -28,11 +28,11 @@
           <small v-if="serverErrors.apellido" class="text-red-500">{{ serverErrors.apellido[0] }}</small>
         </div>
 
-        <!-- Código -->
+        <!-- DNI -->
         <div class="col-span-12 sm:col-span-6">
-          <label class="block font-bold mb-2">Código <span class="text-red-500">*</span></label>
-          <InputText v-model="empleado.codigo" placeholder="Ingrese su código" maxlength="8" class="w-full" />
-          <small v-if="submitted && !empleado.codigo" class="text-red-500">El código es obligatorio.</small>
+          <label class="block font-bold mb-2">DNI <span class="text-red-500">*</span></label>
+          <InputText v-model="empleado.codigo" placeholder="Ingrese su DNI" maxlength="8" class="w-full" />
+          <small v-if="submitted && !empleado.codigo" class="text-red-500">El DNI es obligatorio.</small>
           <small v-if="serverErrors.codigo" class="text-red-500">{{ serverErrors.codigo[0] }}</small>
         </div>
 
@@ -264,12 +264,12 @@ function guardarEmpleado() {
   }
 
   if (!/^\d{8}$/.test(codigo)) {
-    toast.add({ severity: 'warn', summary: 'Código inválido', detail: 'El código debe ser 8 números', life: 3000 });
+    toast.add({ severity: 'warn', summary: 'DNI inválido', detail: 'El DNI debe ser 8 números', life: 3000 });
     return;
   }
 
   if (!Number.isInteger(idHuella) || idHuella <= 0) {
-    toast.add({ severity: 'warn', summary: 'Huella inválida', detail: 'La huella debe ser un número entero positivo', life: 3000 });
+    toast.add({ severity: 'warn', summary: 'Huella inválida', detail: 'La huella debe ser un número', life: 3000 });
     return;
   }
 
