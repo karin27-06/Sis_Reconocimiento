@@ -211,7 +211,7 @@ $empleadoId = null;
 
             $idMovimiento = DB::getPdo()->lastInsertId(); 
 
-            if (($respuesta['reconocido'] ?? 0) === 1 && ($respuesta['acceso'] ?? 0) === 1) {
+           if (($respuesta['reconocido'] ?? 0) === 1) {
                 $empleadoId = $empleadoReconocido->id ?? ($empleado->id ?? null);
 
                 if ($empleadoId) {
