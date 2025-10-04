@@ -248,6 +248,12 @@ onMounted(() => {
             {{ data.error && data.error != 0 ? data.error : 'Ninguno' }}
         </template>
     </Column>
+    <Column field="persona" header="Persona" sortable style="min-width: 12rem">
+    <template #body="{ data }">
+        {{ data.persona ?? '---' }}
+    </template>
+</Column>
+
     <Column field="fechaEnvioESP32" header="Envío ESP32" sortable style="min-width: 13rem" />
     <Column field="fechaRecepcion" header="Recepción" sortable style="min-width: 13rem" />
     <Column field="fechaReconocimiento" header="Reconocimiento" sortable style="min-width: 13rem" />

@@ -20,23 +20,24 @@ use Illuminate\Support\Facades\Gate;
 class MovementController extends Controller
 {
     public function index(Request $request)
-    {
-        Gate::authorize('viewAny', Movement::class);
-        $perPage = $request->input('per_page', 15);
-        $search = $request->input('search');
-        $idTipo = $request->input('idTipo'); // 🔹 obtenemos idTipo del request
+{
+    Gate::authorize('viewAny', Movement::class);
+    $perPage = $request->input('per_page', 15);
+    $search = $request->input('search');
+    $idTipo = $request->input('idTipo');
 
-        $query = app(Pipeline::class)
-            ->send(Movement::query())
-            ->through([
-                new FilterByMovement($search, $idTipo), // 🔹 pasamos idTipo al pipeline
-                new FilterByReconocido($request->input('reconocido')),
-                new FilterByAccess($request->input('access')),
-            ])
-            ->thenReturn();
+    $query = app(Pipeline::class)
+        ->send(Movement::with('employees')) // 👈 aquí en vez de query()
+        ->through([
+            new FilterByMovement($search, $idTipo),
+            new FilterByReconocido($request->input('reconocido')),
+            new FilterByAccess($request->input('access')),
+        ])
+        ->thenReturn();
 
-        return MovementResource::collection($query->paginate($perPage));
-    }
+    return MovementResource::collection($query->paginate($perPage));
+}
+
 
     public function store(StoreMovementRequest $request)
     {

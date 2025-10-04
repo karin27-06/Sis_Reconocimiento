@@ -40,4 +40,10 @@ class Employee extends Model
         //se agrega todas las relaciones que existan
         return $this->Schedules()->exists();
     }
+    // app/Models/Employee.php
+public function movements()
+{
+    return $this->belongsToMany(Movement::class, 'EmployeeMovement', 'idEmpleado', 'idMovimiento');
+}
+
 }
