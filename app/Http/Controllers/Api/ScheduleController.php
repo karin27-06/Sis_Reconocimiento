@@ -30,7 +30,8 @@ class ScheduleController extends Controller
                 new FilterBySearch($search),
                 new FilterByState($request->input('state')),
             ])
-            ->thenReturn();
+            ->thenReturn()
+            ->orderBy('created_at', 'desc');
 
         return ScheduleResource::collection($query->paginate($perPage));
     }

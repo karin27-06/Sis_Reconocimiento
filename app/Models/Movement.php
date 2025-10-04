@@ -36,4 +36,10 @@ class Movement extends Model
     {
         return Alert::whereJsonContains('idMovimientos', $this->id)->exists();
     }
+    // app/Models/Movement.php
+public function employees()
+{
+    return $this->belongsToMany(Employee::class, 'EmployeeMovement', 'idMovimiento', 'idEmpleado');
+}
+
 }

@@ -10,6 +10,8 @@ class MovementResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+            $empleado = $this->employees->first(); // puede haber varios, tomamos el primero
+
         return [
             'id' => $this->id,
             'idEspacio' => $this->idEspacio,
@@ -28,6 +30,7 @@ class MovementResource extends JsonResource
             'fechaReconocimiento' => $this->fechaReconocimiento 
                 ? Carbon::parse($this->fechaReconocimiento)->format('d-m-Y H:i:s A') 
                 : null,
+            'persona' => $empleado ? $empleado->name . ' ' . $empleado->apellido : null,     
             'creacion' => Carbon::parse($this->created_at)->format('d-m-Y H:i:s A'),
             'actualizacion' => Carbon::parse($this->updated_at)->format('d-m-Y H:i:s A'),
         ];
