@@ -94,7 +94,7 @@ $empleadoId = null;
                             "foto2" => 'data:image/png;base64,' . base64_encode(file_get_contents($rutaFotoEmpleado))
                         ]);
 
-                        $ch = curl_init("http://185.140.33.51:5000/comparar");
+                        $ch = curl_init("http://185.140.33.65:5000/comparar");
                         curl_setopt($ch, CURLOPT_POST, true);
                         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
